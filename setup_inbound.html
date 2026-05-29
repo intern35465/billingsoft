@@ -388,7 +388,7 @@ function renderLiveInventoryGrid() {
             <thead>
                 <tr>
                     <th>SKU Code</th>
-                    <th>Product Name</th>
+                    <th>Product Name (Keys Debug)</th>
                     <th>Quantity</th>
                     <th>Unit Price</th>
                 </tr>
@@ -410,7 +410,10 @@ function renderLiveInventoryGrid() {
         
         const actualName = item.productName || item.name || item.itemName || 'N/A';
         
-        // 🔥 CRITICAL QUANTITY FALLBACK CHECKER (Checks productQuantity, pqty, stock, etc.)
+        // DYNAMICALLY DETECT WHATEVER RAW KEYS ARE INSIDE THE OBJECT TO DEBUG THE QUANTITY FIELD
+        const objectKeysString = Object.keys(item).join(', ');
+        const diagnosticDisplayName = `${actualName} <span style="color:#aaa; font-size:10px; display:block;">Keys: [${objectKeysString}]</span>`;
+
         let actualQty = 0;
         if (item.quantity !== undefined) actualQty = item.quantity;
         else if (item.qty !== undefined) actualQty = item.qty;
@@ -426,8 +429,8 @@ function renderLiveInventoryGrid() {
         gridHtml += `
             <tr onclick="quickSelectSku('${actualSku}')" style="cursor: pointer;" title="Click to auto-populate editor tool">
                 <td style="color: #ff7200; font-weight: bold;">${actualSku}</td>
-                <td>${actualName}</td>
-                <td style="font-weight: bold; color: ${Number(actualQty) > 0 ? '#55ff55' : '#ff4444'}">${actualQty}</td>
+                <td>${diagnosticDisplayName}</td>
+                <td style="font-weight: bold; color: #55ff55">${actualQty}</td>
                 <td>₹${actualPrice}</td>
             </tr>
         `;
@@ -467,7 +470,6 @@ function fetchProductToEditor() {
     if (targetFirebaseKey && matchingData) {
         const structuralSku = matchingData.sku || matchingData.productSku || matchingData.product_sku || matchingData.itemSku || matchingData.skuCode || matchingData.id;
         
-        // Find correct quantity key structure to populate editor field
         let targetQty = 0;
         if (matchingData.quantity !== undefined) targetQty = matchingData.quantity;
         else if (matchingData.qty !== undefined) targetQty = matchingData.qty;
@@ -504,7 +506,6 @@ document.getElementById("editStockForm").addEventListener("submit", async (e) =>
     const originalItem = completeInventory[targetFirebaseKey];
     const modifiedPayload = {};
 
-    // Match exact text properties found inside database node
     if (originalItem.productName !== undefined) modifiedPayload.productName = document.getElementById("stockName").value.trim();
     if (originalItem.name !== undefined) modifiedPayload.name = document.getElementById("stockName").value.trim();
     if (originalItem.itemName !== undefined) modifiedPayload.itemName = document.getElementById("stockName").value.trim();
