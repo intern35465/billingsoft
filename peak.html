@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Stock Inbound & Peak</title>
+    <title>Peak - Search Stock</title>
 
     <style>
         body {
@@ -10,7 +10,7 @@
             padding: 20px;
         }
 
-        form, .container {
+        .container {
             background-color: #f5f5f5;
             padding: 20px;
             width: 300px;
@@ -18,8 +18,7 @@
             margin-bottom: 30px;
         }
 
-        input[type="text"],
-        input[type="number"] {
+        input[type="text"] {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
@@ -28,8 +27,6 @@
             box-sizing: border-box;
         }
 
-        input[type="submit"],
-        input[type="reset"],
         button {
             padding: 10px 20px;
             border: none;
@@ -37,17 +34,6 @@
             color: white;
             cursor: pointer;
             margin-top: 10px;
-        }
-
-        input[type="submit"] {
-            background-color: green;
-        }
-
-        input[type="reset"] {
-            background-color: red;
-        }
-
-        button {
             background-color: #007BFF;
             width: 100%;
         }
@@ -66,31 +52,6 @@
 
 <body>
 
-    <h1>Stock Inbound</h1>
-
-    <form id="stockForm">
-        <label>Product Name:</label><br>
-        <input type="text" id="productName" placeholder="Enter product name" required><br><br>
-
-        <label>Description:</label><br>
-        <input type="text" id="description" placeholder="Enter product description"><br><br>
-
-        <label>Product Quantity (grams):</label><br>
-        <input type="number" id="quantityGrams" placeholder="Enter quantity" required><br><br>
-
-        <label>No. of Products:</label><br>
-        <input type="number" id="productCount" placeholder="Enter number of products" required><br><br>
-
-        <label>Price per piece:</label><br>
-        <input type="number" id="price" placeholder="Enter price" required><br><br>
-
-        <label>SKU:</label><br>
-        <input type="text" id="skuBox" readonly placeholder="Auto generated SKU"><br><br>
-
-        <input type="submit" value="Submit">
-        <input type="reset" value="Clear">
-    </form>
-
     <h1>Peak</h1>
 
     <div class="container">
@@ -105,9 +66,9 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        // Added 'query', 'orderByChild', and 'equalTo' to help filter data
-        import { getDatabase, ref, push, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+        // Your exact Firebase keys
         const firebaseConfig = {
             apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
             authDomain: "zbillz-f4798.firebaseapp.com",
@@ -122,52 +83,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // SKU Generator setup
-        let letter = "A";
-        let number = 111;
-
-        function generateSKU() {
-            const skuBox = document.getElementById("skuBox");
-            if (skuBox) skuBox.value = letter + number;
-        }
-
-        generateSKU();
-
-        // 1. STOCK INBOUND FORM SUBMISSION LOGIC
-        const form = document.getElementById('stockForm');
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const currentSku = letter + number;
-
-            const stockData = {
-                productName: document.getElementById("productName").value,
-                description: document.getElementById("description").value,
-                quantityGrams: Number(document.getElementById("quantityGrams").value),
-                productCount: Number(document.getElementById("productCount").value),
-                price: Number(document.getElementById("price").value),
-                sku: currentSku
-            };
-
-            try {
-                await push(ref(db, 'inventory'), stockData);
-                alert(`Successfully saved stock for SKU: ${currentSku}`);
-
-                number++;
-                if (number > 999) {
-                    number = 111;
-                    if (letter == "A") letter = "B";
-                    else if (letter == "B") letter = "C";
-                }
-
-                form.reset();
-                generateSKU();
-            } catch (error) {
-                console.error(error);
-                alert("Failed to save data.");
-            }
-        });
-
-        // 2. NEW PEAK SEARCH FUNCTIONALITY
         const searchBtn = document.getElementById('searchBtn');
         const resultBox = document.getElementById('resultBox');
 
@@ -182,19 +97,15 @@
             resultBox.innerHTML = "Searching...";
 
             try {
-                // Query database to find items where 'sku' equals the input SKU string
                 const inventoryRef = ref(db, 'inventory');
                 const skuQuery = query(inventoryRef, orderByChild('sku'), equalTo(inputSku));
                 const snapshot = await get(skuQuery);
 
                 if (snapshot.exists()) {
                     const data = snapshot.val();
-                    
-                    // Firebase returns data with a unique ID key, so we pull out the first matching product object
                     const key = Object.keys(data)[0];
                     const product = data[key];
 
-                    // Display details inside result box cleanly
                     resultBox.innerHTML = `
                         <strong>Name:</strong> ${product.productName}<br>
                         <strong>Description:</strong> ${product.description || 'None'}<br>
