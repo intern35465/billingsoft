@@ -24,6 +24,11 @@
 
             <button type="submit" class="submit-btn">Login</button>
         </form>
+        
+        <div id="debugAuthWindow" style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,114,0,0.4); border-radius: 10px; color: #aaa; font-size: 12px; text-align: left; display: none;">
+            <b style="color: #ff7200;">System Deep Diagnostics:</b>
+            <div id="debugLog" style="margin-top: 5px; font-family: monospace; white-space: pre-wrap; word-break: break-all;"></div>
+        </div>
     </div>
 
     <script type="module">
@@ -44,11 +49,12 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // 💡 MASTER BACKDOOR CREDENTIALS
         const MASTER_USER = "admin";
         const MASTER_PASS = "ZbilzPassword123";
 
         const credentialForm = document.getElementById('credentialLoginForm');
+        const debugAuthWindow = document.getElementById('debugAuthWindow');
+        const debugLog = document.getElementById('debugLog');
 
         credentialForm.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -56,43 +62,76 @@
             const rawUser = document.getElementById('loginUsername').value.trim();
             const typedPass = document.getElementById('loginPassword').value;
 
-            // 1. First Check: Built-in Master Admin account
+            // 1. Built-in Master Admin account check
             if (rawUser.toLowerCase() === MASTER_USER && typedPass === MASTER_PASS) {
                 localStorage.setItem("isLoggedIn", "true");
                 localStorage.setItem("userRole", "admin");
-                window.location.href = "main.html"; // UPDATED ROUTE
+                window.location.href = "main.html";
                 return;
             }
 
+            // Show diagnostic log area on submit
+            debugAuthWindow.style.display = "block";
+            debugLog.innerHTML = "Initiating database trace for path keys...\n";
+
             try {
-                // 2. Second Check: Look up using lowercase first
+                // Try to check standard paths first
                 let userRef = ref(db, `registered_users/${rawUser.toLowerCase()}`);
                 let snapshot = await get(userRef);
 
-                // 3. Fallback Check: If lowercase wasn't found, check the EXACT casing (e.g., User1)
                 if (!snapshot.exists()) {
                     userRef = ref(db, `registered_users/${rawUser}`);
                     snapshot = await get(userRef);
                 }
 
-                if (snapshot.exists()) {
-                    const accountData = snapshot.val();
-
-                    // Check for password inside 'password' or 'pass' keys dynamically
-                    const dbPassword = accountData.password || accountData.pass;
-
-                    if (dbPassword === typedPass) {
-                        localStorage.setItem("isLoggedIn", "true");
-                        localStorage.setItem("userRole", accountData.role || "user");
-                        window.location.href = "main.html"; // UPDATED ROUTE
+                // If regular checks fail, trigger deep path mapping!
+                if (!snapshot.exists()) {
+                    debugLog.innerHTML += `❌ Target '${rawUser}' not found in 'registered_users'.\n`;
+                    debugLog.innerHTML += `🔍 Scanning database main layout for structural matching...\n`;
+                    
+                    // Fetch the entire database root snapshot to map it out
+                    const rootSnapshot = await get(ref(db));
+                    if (rootSnapshot.exists()) {
+                        const fullDb = rootSnapshot.val();
+                        const rootPaths = Object.keys(fullDb);
+                        debugLog.innerHTML += `Found Root Nodes: [${rootPaths.join(', ')}]\n`;
+                        
+                        // Let's sweep all fields inside the database to hunt for "User1"
+                        let pathFound = "Unknown Location";
+                        for (const node of rootPaths) {
+                            if (typeof fullDb[node] === 'object' && fullDb[node] !== null) {
+                                const subKeys = Object.keys(fullDb[node]);
+                                if (subKeys.some(k => k.toLowerCase() === rawUser.toLowerCase())) {
+                                    pathFound = `${node}/`;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        debugLog.innerHTML += `\n💡 MATCH FOUND!\nYour registration system is saving users under: "${pathFound}" instead of "registered_users/"`;
                     } else {
-                        alert("Incorrect password. Please try again.");
+                        debugLog.innerHTML += `❌ Database root appears empty. Check connectivity.`;
                     }
-                } else {
-                    alert("Account username not registered in system. Double-check your casing or use default 'admin'.");
+                    
+                    alert("Account mismatch caught by diagnostic tracer. View the debug box below the form!");
+                    return;
                 }
+
+                // If found, login normally
+                const accountData = snapshot.val();
+                const dbPassword = accountData.password || accountData.pass;
+
+                if (dbPassword === typedPass) {
+                    localStorage.setItem("isLoggedIn", "true");
+                    localStorage.setItem("userRole", accountData.role || "user");
+                    window.location.href = "main.html";
+                } else {
+                    alert("Incorrect password. Please try again.");
+                }
+
             } catch (error) {
                 console.error("Firebase connection error: ", error);
+                debugLog.innerHTML += `\nCRITICAL CONNECTION ERROR: ${error.message}`;
                 alert("Error connecting to database logic.");
             }
         });
