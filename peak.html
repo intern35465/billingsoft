@@ -2,127 +2,169 @@
 <html>
 
 <head>
-    <title>Peak - Search Stock</title>
+    <title>Peak</title>
 
     <style>
         body {
             font-family: Arial;
             padding: 20px;
+            background: #f4f4f4;
         }
 
-        .container {
-            background-color: #f5f5f5;
+        .box {
+            background: white;
             padding: 20px;
-            width: 300px;
             border-radius: 10px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
-        input[type="text"] {
+        input {
             width: 100%;
             padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
+            margin-top: 10px;
         }
 
         button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            color: white;
-            cursor: pointer;
-            margin-top: 10px;
-            background-color: #007BFF;
             width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            cursor: pointer;
         }
 
-        .result {
-            margin-top: 15px;
-            padding: 10px;
-            background-color: #ffffff;
-            border: 1px dashed #bbb;
-            border-radius: 6px;
-            font-size: 14px;
-            line-height: 1.5;
+        .searchBtn {
+            background: blue;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background: #ddd;
         }
     </style>
 </head>
 
 <body>
 
-    <h1>Peak</h1>
+<h1>Peak</h1>
 
-    <div class="container">
-        <label>Enter SKU Number:</label>
-        <input type="text" id="skuInput" placeholder="Search SKU...">
-        <button id="searchBtn">Search</button>
+<div class="box">
 
-        <div class="result" id="resultBox">
-            Result will appear here
-        </div>
-    </div>
+    <input type="text" id="searchSku" placeholder="Enter SKU">
+    <button class="searchBtn" onclick="searchProduct()">Search</button>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    <div class="result">Result will appear here</div>
 
-        // Your exact Firebase keys
-        const firebaseConfig = {
-            apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
-            authDomain: "zbillz-f4798.firebaseapp.com",
-            databaseURL: "https://zbillz-f4798-default-rtdb.firebaseio.com",
-            projectId: "zbillz-f4798",
-            storageBucket: "zbillz-f4798.firebasestorage.app",
-            messagingSenderId: "495466751324",
-            appId: "1:495466751324:web:324e3440f13fad0acdcd99",
-            measurementId: "G-8SZG4XLT9P"
-        };
+</div>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+<div class="box">
 
-        const searchBtn = document.getElementById('searchBtn');
-        const resultBox = document.getElementById('resultBox');
+    <h3>All Products</h3>
 
-        searchBtn.addEventListener('click', async () => {
-            const inputSku = document.getElementById('skuInput').value.trim();
+    <div id="tableArea">Loading...</div>
 
-            if (inputSku === "") {
-                resultBox.innerHTML = "<span style='color:red;'>Please enter an SKU code.</span>";
-                return;
-            }
+</div>
 
-            resultBox.innerHTML = "Searching...";
+<script type="module">
 
-            try {
-                const inventoryRef = ref(db, 'inventory');
-                const skuQuery = query(inventoryRef, orderByChild('sku'), equalTo(inputSku));
-                const snapshot = await get(skuQuery);
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    const key = Object.keys(data)[0];
-                    const product = data[key];
+const firebaseConfig = {
+    apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
+    authDomain: "zbillz-f4798.firebaseapp.com",
+    databaseURL: "https://zbillz-f4798-default-rtdb.firebaseio.com",
+    projectId: "zbillz-f4798",
+    storageBucket: "zbillz-f4798.firebasestorage.app",
+    messagingSenderId: "495466751324",
+    appId: "1:495466751324:web:324e3440f13fad0acdcd99"
+};
 
-                    resultBox.innerHTML = `
-                        <strong>Name:</strong> ${product.productName}<br>
-                        <strong>Description:</strong> ${product.description || 'None'}<br>
-                        <strong>Weight:</strong> ${product.quantityGrams}g<br>
-                        <strong>Count:</strong> ${product.productCount} pcs<br>
-                        <strong>Price:</strong> $${product.price}
-                    `;
-                } else {
-                    resultBox.innerHTML = "<span style='color:orange;'>No product found with that SKU.</span>";
-                }
-            } catch (error) {
-                console.error("Error looking up SKU: ", error);
-                resultBox.innerHTML = "<span style='color:red;'>Error fetching data. Check network console.</span>";
-            }
-        });
-    </script>
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let products = [];
+
+// LOAD DATA FROM FIREBASE
+onValue(ref(db, "inventory"), (snapshot) => {
+
+    products = [];
+
+    snapshot.forEach(item => {
+        products.push(item.val());
+    });
+
+    renderTable();
+});
+
+function renderTable() {
+
+    let box = document.getElementById("tableArea");
+
+    if (products.length === 0) {
+        box.innerHTML = "No products available";
+        return;
+    }
+
+    let html = `
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Quantity (g)</th>
+                <th>SKU</th>
+            </tr>
+    `;
+
+    products.forEach(p => {
+        html += `
+            <tr>
+                <td>${p.productName}</td>
+                <td>${p.quantityGrams}</td>
+                <td>${p.sku}</td>
+            </tr>
+        `;
+    });
+
+    html += `</table>`;
+
+    box.innerHTML = html;
+}
+
+// SEARCH
+window.searchProduct = function () {
+
+    let sku = document.getElementById("searchSku").value;
+
+    let found = products.find(p => p.sku === sku);
+
+    let box = document.querySelector(".result");
+
+    if (!found) {
+        box.innerHTML = "❌ Product not found";
+        return;
+    }
+
+    box.innerHTML = `
+        <b>Product Found</b><br><br>
+        Name: ${found.productName}<br>
+        Description: ${found.description}<br>
+        Quantity: ${found.quantityGrams}<br>
+        No: ${found.productCount}<br>
+        Price: ${found.price}<br>
+        SKU: ${found.sku}
+    `;
+};
+
+</script>
 
 </body>
-
 </html>
