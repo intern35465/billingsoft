@@ -1,60 +1,48 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock Inbound</title>
+    
+    <script src="auth-guard.js"></script>
+    
     <link rel="stylesheet" href="stockinbound.css">
-
-    <style>
-        body {
-            font-family: Arial;
-            padding: 20px;
-        }
-
-        form {
-            background: #f5f5f5;
-            padding: 20px;
-            width: 300px;
-            border-radius: 10px;
-            box-sizing: border-box;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-        }
-
-        input[type="submit"],
-        input[type="reset"] {
-            cursor: pointer;
-        }
-    </style>
-
-<script src="auth-guard.js"></script>
 </head>
-
 <body>
 
-<h1>Stock Inbound</h1>
+    <div class="form-container">
+        
+        <h1>Stock Inbound</h1>
 
-<form id="stockForm">
+        <form id="stockForm">
 
-    <input type="text" id="productName" placeholder="Product Name" required>
-    <input type="text" id="description" placeholder="Description">
-    <input type="number" id="quantityGrams" placeholder="Quantity (grams or boxes)" required>
-    <input type="number" id="productCount" placeholder="No. of Products" required>
-    <input type="number" id="price" placeholder="Price" required>
+            <label for="productName">Product Name</label>
+            <input type="text" id="productName" placeholder="Enter product name" required>
 
-    <input type="text" id="skuBox" readonly>
+            <label for="description">Description</label>
+            <input type="text" id="description" placeholder="Enter details (Optional)">
 
-    <input type="submit" value="Submit">
-    <input type="reset" value="Clear">
+            <label for="quantityGrams">Quantity (Grams / Boxes)</label>
+            <input type="number" id="quantityGrams" placeholder="Enter measurement quantity" required>
 
-</form>
+            <label for="productCount">No. of Products</label>
+            <input type="number" id="productCount" placeholder="Enter stock count value" required>
+
+            <label for="price">Price</label>
+            <input type="number" id="price" placeholder="Enter individual item price" required>
+
+            <label for="skuBox">Generated Item SKU (Unique)</label>
+            <input type="text" id="skuBox" readonly>
+
+            <div class="button-group">
+                <input type="submit" value="Submit">
+                <input type="reset" value="Clear">
+            </div>
+            
+            <input type="button" value="Back to Home" onclick="window.location.href='index.html'" style="background: #222; margin-top: 15px; width: 100%; border: none; border-radius: 10px; padding: 13px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.4s;">
+        </form>
+        
+    </div>
 
 <script type="module">
 
@@ -74,19 +62,24 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// SKU system (SAFE - NO RESET BUTTON)
-let letter = localStorage.getItem("skuLetter") || "A";
-let number = Number(localStorage.getItem("skuNumber")) || 111;
-
-function generateSKU() {
-    document.getElementById("skuBox").value = letter + number;
+// NON-REPEATING SKU GENERATION LOGIC
+function generateUniqueSKU() {
+    const chars = "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789"; // Removed O and 0 to avoid visual confusion
+    let result = "SKU-";
+    for (let i = 0; i < 5; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    document.getElementById("skuBox").value = result;
 }
-generateSKU();
 
+// Generate the initial SKU immediately when loading the dashboard interface
+generateUniqueSKU();
+
+// Handle Form Submissions to Firebase Realtime Database
 document.getElementById("stockForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const sku = letter + number;
+    const currentGeneratedSku = document.getElementById("skuBox").value;
 
     const data = {
         productName: document.getElementById("productName").value,
@@ -94,26 +87,27 @@ document.getElementById("stockForm").addEventListener("submit", async (e) => {
         quantityGrams: Number(document.getElementById("quantityGrams").value),
         productCount: Number(document.getElementById("productCount").value),
         price: Number(document.getElementById("price").value),
-        sku: sku
+        sku: currentGeneratedSku
     };
 
-    await push(ref(db, "inventory"), data);
+    try {
+        await push(ref(db, "inventory"), data);
 
-    number++;
+        // Reset all editable fields in the form element cleanly
+        e.target.reset();
+        
+        // Instantly generate a completely new, unique random SKU for the next execution cycle
+        generateUniqueSKU();
 
-    if (number > 999) {
-        number = 111;
-        if (letter === "A") letter = "B";
-        else if (letter === "B") letter = "C";
+        alert("Product Saved Successfully!");
+    } catch (error) {
+        alert("Submission Failed: Make sure your account has admin write privileges configured.");
     }
+});
 
-    localStorage.setItem("skuLetter", letter);
-    localStorage.setItem("skuNumber", number);
-
-    e.target.reset();
-    generateSKU();
-
-    alert("Product Saved Successfully!");
+// Re-generate SKU if user resets form manually to prevent stale state values
+document.getElementById("stockForm").addEventListener("reset", () => {
+    setTimeout(generateUniqueSKU, 10);
 });
 
 </script>
