@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zbilz - Personnel Registration</title>
+    
+    <script src="auth-guard.js"></script>
+
+    <link rel="stylesheet" href="stockinbound.css">
+    
+    <link rel="stylesheet" href="register_staff.css?v=1">
+</head>
+<body>
+
+    <h1>Personnel <span>Registration Hub</span></h1>
+    <p class="admin-warning-subtitle">Authorized Admin Workspace: Register and view active system operators</p>
+
+    <div class="admin-workspace">
+
+        <div class="control-panel">
+            <form id="staffRegisterForm" style="width: 100%; max-width: 100%;">
+                
+                <label for="staffUidBox">Staff System ID (Auto)</label>
+                <input type="text" id="staffUidBox" readonly style="color: #ff7200; font-weight: bold;">
+
+                <label for="staffName">Full Name / Username</label>
+                <input type="text" id="staffName" placeholder="Enter username or operator name" required>
+
+                <label for="staffContact">Contact Number</label>
+                <input type="number" id="staffContact" placeholder="Enter mobile contact number" required>
+
+                <label for="staffRole">System Clearance Level (Role)</label>
+                <select id="staffRole" required style="width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 13px; color: white; font-weight: bold; margin-bottom: 20px; outline: none; appearance: none; -webkit-appearance: none;">
+                    <option value="user" style="background: #111; color: white;">Standard Operator (User)</option>
+                    <option value="admin" style="background: #111; color: #ff7200;">Root Administrator (Admin)</option>
+                </select>
+
+                <label for="staffPassword">Terminal Security Password</label>
+                <input type="password" id="staffPassword" placeholder="Assign login password key" required>
+
+                <div class="button-group">
+                    <input type="submit" value="Authorize Personnel">
+                    <input type="reset" value="Clear Form">
+                </div>
+
+                <input type="button" value="Back to Setup Hub" onclick="window.location.href='setup.html'" style="background: #222; margin-top: 15px; width: 100%; border: none; border-radius: 10px; padding: 13px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.4s;">
+            </form>
+        </div>
+
+        <div class="registry-panel">
+            <h3>Active Terminal Operators Ledger</h3>
+            <div class="table-scroll-container">
+                <div id="staffLiveGrid">Connecting to authorization node...</div>
+            </div>
+        </div>
+
+    </div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
+    authDomain: "zbillz-f4798.firebaseapp.com",
+    databaseURL: "https://zbillz-f4798-default-rtdb.firebaseio.com",
+    projectId: "zbillz-f4798",
+    storageBucket: "zbillz-f4798.firebasestorage.app",
+    messagingSenderId: "495466751324",
+    appId: "1:495466751324:web:324e3440f13fad0acdcd99"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let staffList = [];
+
+// ⚡ NON-REPEATING STAFF ID GENERATOR
+function generateUniqueStaffID() {
+    const timestampMillis = Date.now().toString();
+    const shortNum = timestampMillis.slice(-5); 
+    document.getElementById("staffUidBox").value = "ZBZ-STF-" + shortNum;
+}
+
+generateUniqueStaffID();
+
+// STREAM ACTIVE USERS FROM SYSTEM BACKEND
+onValue(ref(db, "users"), (snapshot) => {
+    staffList = [];
+    if (snapshot.exists()) {
+        snapshot.forEach(child => {
+            staffList.push(child.val());
+        });
+    }
+    renderStaffGrid();
+});
+
+function renderStaffGrid() {
+    const displayContainer = document.getElementById("staffLiveGrid");
+
+    if (staffList.length === 0) {
+        displayContainer.innerHTML = "<p style='color: #aaa; text-align:center;'>No authorized system users found.</p>";
+        return;
+    }
+
+    let gridHtml = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Staff ID</th>
+                    <th>Username</th>
+                    <th>Contact</th>
+                    <th>Clearance Role</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    staffList.forEach(user => {
+        const isAdmin = user.role === 'admin';
+        gridHtml += `
+            <tr>
+                <td style="color: #ff7200; font-weight: bold;">${user.staffId || 'N/A'}</td>
+                <td>${user.username || user.name || 'N/A'}</td>
+                <td>${user.phone || 'N/A'}</td>
+                <td style="font-weight: bold; color: ${isAdmin ? '#ff4444' : '#55ff55'}">
+                    ${isAdmin ? 'ADMIN' : 'USER'}
+                </td>
+            </tr>
+        `;
+    });
+
+    gridHtml += `</tbody></table>`;
+    displayContainer.innerHTML = gridHtml;
+}
+
+// REGISTER ACTIONS
+document.getElementById("staffRegisterForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const dataPayload = {
+        staffId: document.getElementById("staffUidBox").value,
+        username: document.getElementById("staffName").value.trim(),
+        phone: document.getElementById("staffContact").value,
+        role: document.getElementById("staffRole").value,
+        password: document.getElementById("staffPassword").value, // Accessible context security payload node
+        registeredOn: new Date().toLocaleString()
+    };
+
+    try {
+        await push(ref(db, "users"), dataPayload);
+        e.target.reset();
+        generateUniqueStaffID();
+        alert("System Operator Authorization Keys Created Successfully!");
+    } catch (error) {
+        alert("Database Access Denied: " + error.message);
+    }
+});
+
+document.getElementById("staffRegisterForm").addEventListener("reset", () => {
+    setTimeout(generateUniqueStaffID, 10);
+});
+
+</script>
+
+</body>
+</html>
