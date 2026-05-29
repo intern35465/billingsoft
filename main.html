@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Zbilz - Inventory Dashboard</title>
+
+    <script src="auth-guard.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="main">
+        <div class="navbar">
+            <div class="icon">
+                <h2 class="logo">Zbilz</h2>
+            </div>
+
+            <div class="menu">
+                <ul>
+                    <li><a href="index.html">HOME</a></li>
+                    <li><a href="warehouse.html">INVENTORY</a></li>
+                    <li><a href="billing.html">BILLING</a></li>
+                    <li><a href="invoice.html">INVOICE TRACKING</a></li>
+                    <li id="adminSetupNav"><a href="setup.html">SETUP</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content">
+            <h1>Stock <span>Management</span></h1>
+            <p>Monitor warehouse metrics, observe system assets, and process customer ledger tracks instantly from a centralized dashboard matrix.</p>
+            <button class="btn" onclick="window.location.href='warehouse.html'">Manage Stock</button>
+        </div>
+
+        <div class="cards">
+            <div class="card">
+                <h2>Total Stock</h2>
+                <div class="live-counter" id="totalQuantity">--</div>
+                <p>Physical products in system</p>
+            </div>
+
+            <div class="card recent-card">
+                <h2>Recent Inbound</h2>
+                <div id="recentItemBox">
+                    <div class="recent-title" id="recentName">Loading...</div>
+                    <div class="recent-meta">SKU: <span id="recentSku">--</span></div>
+                    <div class="recent-meta">Qty: <span id="recentCount">--</span> pcs</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (localStorage.getItem("userRole") !== "admin") {
+            const setupNavOption = document.getElementById("adminSetupNav");
+            if (setupNavOption) setupNavOption.style.display = "none";
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
+            authDomain: "zbillz-f4798.firebaseapp.com",
+            databaseURL: "https://zbillz-f4798-default-rtdb.firebaseio.com",
+            projectId: "zbillz-f4798",
+            storageBucket: "zbillz-f4798.firebasestorage.app",
+            messagingSenderId: "495466751324",
+            appId: "1:495466751324:web:324e3440f13fad0acdcd99",
+            measurementId: "G-8SZG4XLT9P"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const totalQuantityBox = document.getElementById('totalQuantity');
+        const recentNameBox = document.getElementById('recentName');
+        const recentSkuBox = document.getElementById('recentSku');
+        const recentCountBox = document.getElementById('recentCount');
+
+        const inventoryRef = ref(db, 'inventory');
+        onValue(inventoryRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                let cumulativeStock = 0;
+                Object.values(data).forEach(item => {
+                    if (item.productCount) cumulativeStock += Number(item.productCount);
+                });
+                totalQuantityBox.innerText = cumulativeStock;
+
+                const keys = Object.keys(data);
+                const lastKey = keys[keys.length - 1]; 
+                const lastItem = data[lastKey];
+
+                recentNameBox.innerText = lastItem.productName || "No Name";
+                recentSkuBox.innerText = lastItem.sku || "--";
+                recentCountBox.innerText = lastItem.productCount || "0";
+            } else {
+                totalQuantityBox.innerText = "0";
+                recentNameBox.innerText = "Warehouse Empty";
+            }
+        });
+    </script>
+</body>
+</html>
