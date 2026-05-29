@@ -84,7 +84,7 @@ function generateUniqueVendorID() {
 
 generateUniqueVendorID();
 
-// FETCH & DYNAMICALLY RENDER WHOSALE DATA FROM CLOUD INSTANTLY
+// FETCH & DYNAMICALLY RENDER WHOLESALE DATA FROM CLOUD INSTANTLY
 onValue(ref(db, "wholesale_vendors"), (snapshot) => {
     vendorsList = [];
     if (snapshot.exists()) {
