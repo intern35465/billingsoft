@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zbilz - Customize Stock Inbound</title>
+    
+    <script src="auth-guard.js"></script>
+
+    <link rel="stylesheet" href="stockinbound.css">
+    
+    <link rel="stylesheet" href="setup_inbound.css?v=1">
+</head>
+<body>
+
+    <h1>Customize <span>Stock Inbound</span></h1>
+    <p class="admin-warning-subtitle">Authorized Admin Workspace: Modify or delete master inventory records</p>
+
+    <div class="admin-workspace">
+
+        <div class="control-panel">
+            <div class="search-box-wrapper">
+                <label for="searchSku">Search Product by SKU Code</label>
+                <div class="search-row">
+                    <input type="text" id="searchSku" placeholder="e.g. SKU-K8J21">
+                    <button type="button" id="btnFetch">Fetch</button>
+                </div>
+            </div>
+
+            <form id="editStockForm" class="disabled-form">
+                <label for="displaySku">Product SKU Code</label>
+                <input type="text" id="displaySku" readonly class="read-only-input">
+
+                <label for="stockName">Product Item Name</label>
+                <input type="text" id="stockName" required placeholder="Item description name">
+
+                <label for="stockQty">Available Quantity (Current Count)</label>
+                <input type="number" id="stockQty" required placeholder="Adjust balance volume" min="0">
+
+                <label for="stockPrice">Unit Retail Price (₹)</label>
+                <input type="number" id="stockPrice" required placeholder="Adjust value amount" min="0">
+
+                <div class="admin-button-group">
+                    <button type="submit" id="btnUpdate" class="btn-action btn-save">Update Record</button>
+                    <button type="button" id="btnDelete" class="btn-action btn-danger">Delete Item</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="registry-panel">
+            <h3>Active Warehouse Stock Grid</h3>
+            <div class="table-scroll-container">
+                <div id="inventoryLiveGrid">Reading warehouse node data...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div style="text-align: center; width: 100%; margin-top: 25px; position: relative; z-index: 2;">
+        <a href="setup.html" class="abort-panel-btn">Back to Setup Hub</a>
+    </div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
+    authDomain: "zbillz-f4798.firebaseapp.com",
+    databaseURL: "https://zbillz-f4798-default-rtdb.firebaseio.com",
+    projectId: "zbillz-f4798",
+    storageBucket: "zbillz-f4798.firebasestorage.app",
+    messagingSenderId: "495466751324",
+    appId: "1:495466751324:web:324e3440f13fad0acdcd99"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let completeInventory = {};
+let targetFirebaseKey = null; // Keeps track of the targeted DB item node ID string
+
+// LIVE-STREAM ALL WAREHOUSE INVENTORY NODES
+onValue(ref(db, "inventory"), (snapshot) => {
+    completeInventory = {};
+    if (snapshot.exists()) {
+        completeInventory = snapshot.val();
+    }
+    renderLiveInventoryGrid();
+});
+
+// BUILD AND RENDER INVENTORY TABLE
+function renderLiveInventoryGrid() {
+    const displayContainer = document.getElementById("inventoryLiveGrid");
+    const keys = Object.keys(completeInventory);
+
+    if (keys.length === 0) {
+        displayContainer.innerHTML = "<p style='color: #aaa; text-align:center;'>Warehouse inventory node is empty.</p>";
+        return;
+    }
+
+    let gridHtml = `
+        <table>
+            <thead>
+                <tr>
+                    <th>SKU Code</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    keys.forEach(keyId => {
+        const item = completeInventory[keyId];
+        gridHtml += `
+            <tr onclick="quickSelectSku('${item.productSku || ''}')" style="cursor: pointer;" title="Click to auto-populate editor tool">
+                <td style="color: #ff7200; font-weight: bold;">${item.productSku || 'N/A'}</td>
+                <td>${item.productName || 'N/A'}</td>
+                <td style="font-weight: bold; color: ${Number(item.quantity) > 5 ? '#e0e0e0' : '#ff4444'}">${item.quantity || 0}</td>
+                <td>₹${item.retailPrice || item.price || 0}</td>
+            </tr>
+        `;
+    });
+
+    gridHtml += `</tbody></table>`;
+    displayContainer.innerHTML = gridHtml;
+}
+
+// SHORTCUT: CLICKING A ROW AUTO-FILLS SEARCH BOX
+window.quickSelectSku = function(skuCode) {
+    document.getElementById("searchSku").value = skuCode;
+    fetchProductToEditor();
+};
+
+// SEARCH & POPULATE FIELDS
+document.getElementById("btnFetch").addEventListener("click", fetchProductToEditor);
+
+function fetchProductToEditor() {
+    const searchTarget = document.getElementById("searchSku").value.trim().toUpperCase();
+    if (!searchTarget) { alert("Please provide a SKU code to search."); return; }
+
+    targetFirebaseKey = null;
+    let matchingData = null;
+
+    // Scan dictionary keys for matching sub-property values
+    for (const keyId in completeInventory) {
+        if (completeInventory[keyId].productSku && completeInventory[keyId].productSku.toUpperCase() === searchTarget) {
+            targetFirebaseKey = keyId;
+            matchingData = completeInventory[keyId];
+            break;
+        }
+    }
+
+    if (targetFirebaseKey && matchingData) {
+        // Hydrate target interface inputs
+        document.getElementById("displaySku").value = matchingData.productSku;
+        document.getElementById("stockName").value = matchingData.productName || "";
+        document.getElementById("stockQty").value = matchingData.quantity || 0;
+        document.getElementById("stockPrice").value = matchingData.retailPrice || matchingData.price || 0;
+
+        // Unveil control system fields smoothly
+        document.getElementById("editStockForm").classList.remove("disabled-form");
+    } else {
+        alert("SKU code tracking query returned 0 results in warehouse database node.");
+        clearEditorState();
+    }
+}
+
+// RESET EDITOR UTILITIES
+function clearEditorState() {
+    targetFirebaseKey = null;
+    document.getElementById("editStockForm").reset();
+    document.getElementById("displaySku").value = "";
+    document.getElementById("editStockForm").classList.add("disabled-form");
+}
+
+// FIREBASE ADMIN COMMAND A: UPDATE MUTABLE ATTRIBUTES
+document.getElementById("editStockForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!targetFirebaseKey) return;
+
+    const modifiedPayload = {
+        productName: document.getElementById("stockName").value.trim(),
+        quantity: Number(document.getElementById("stockQty").value),
+        retailPrice: Number(document.getElementById("stockPrice").value)
+    };
+
+    try {
+        await update(ref(db, `inventory/${targetFirebaseKey}`), modifiedPayload);
+        alert("Master inventory ledger record modified successfully.");
+        clearEditorState();
+    } catch (err) {
+        alert("Write transaction rejected by database rules: " + err.message);
+    }
+});
+
+// FIREBASE ADMIN COMMAND B: ERASE TRACKED VARIABLE NODE
+document.getElementById("btnDelete").addEventListener("click", async () => {
+    if (!targetFirebaseKey) return;
+    
+    const confirmation = confirm("CRITICAL OPERATION:\nAre you absolutely certain you want to purge this entire product data tree from the permanent ledger?");
+    if (!confirmation) return;
+
+    try {
+        await remove(ref(db, `inventory/${targetFirebaseKey}`));
+        alert("Stock index item completely dropped from cloud system architecture.");
+        clearEditorState();
+        document.getElementById("searchSku").value = "";
+    } catch (err) {
+        alert("Erase command intercepted or failed: " + err.message);
+    }
+});
+
+</script>
+
+</body>
+</html>
