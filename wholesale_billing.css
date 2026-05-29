@@ -3,11 +3,29 @@
 body {
     flex-direction: column;
     justify-content: flex-start;
+    align-items: center;
+    /* FIX: changed overflow to ensure background expands infinitely on long tables */
     overflow-y: auto;
+    height: auto;
+    min-height: 100vh;
     padding-top: 40px;
+    padding-bottom: 40px;
 }
 
-/* WORKSPACE GRID SYSTEM */
+/* FIX: Forces the dark overlay pseudo-element to expand alongside scrolling content */
+body::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+/* WORKSPACE SYSTEM */
 .main-workspace {
     display: flex;
     gap: 30px;
@@ -21,6 +39,7 @@ body {
 .form-panel {
     flex: 1;
     max-width: 450px;
+    width: 100%;
 }
 
 /* PREMIUM TABLE GLASSMORPHISM PANEL */
@@ -30,11 +49,14 @@ body {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 30px;
+    padding: 25px;
     border-radius: 20px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
     color: white;
     height: fit-content;
+    width: 100%;
+    /* FIX: Added containment box layout optimization */
+    overflow: hidden; 
 }
 
 .table-panel h3 {
@@ -45,9 +67,12 @@ body {
     padding-bottom: 10px;
 }
 
+/* FIX: Locks horizontal overflow properties strictly inside the glass block container */
 .table-scroll {
     width: 100%;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth mobile swipe */
+    border-radius: 8px;
 }
 
 /* REGISTRY TABULAR LAYOUT CONFIGURATION */
@@ -58,17 +83,18 @@ table {
 }
 
 th, td {
-    padding: 12px;
+    padding: 12px 16px;
     text-align: left;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     font-size: 14px;
+    /* FIX: Prevent lengthy string data like GSTIN/Address from crushing neighboring cells */
+    white-space: nowrap; 
 }
 
 th {
     background: rgba(255, 114, 0, 0.15);
     color: #ff7200;
     font-weight: bold;
-    white-space: nowrap;
 }
 
 td {
@@ -80,14 +106,25 @@ tr:hover td {
     color: white;
 }
 
-/* RESPONSIVE MOBILE HANDOFF MAP */
-@media (max-width: 900px) {
-    .main-workspace {
-        flex-direction: column;
-        align-items: center;
+/* ================= HARD CORRECTION BREAKPOINT FOR MOBILE PHONE VIEWS ================= */
+@media (max-width: 950px) {
+    body {
+        padding: 20px 15px;
     }
+
+    .main-workspace {
+        flex-direction: column; /* Stacks form panel above data table panel cleanly */
+        align-items: center;
+        gap: 25px;
+    }
+    
     .form-panel, .table-panel {
         width: 100%;
         max-width: 100%;
+        flex: none;
+    }
+
+    .table-panel {
+        padding: 15px; /* Saves real estate padding widths inside mobile windows */
     }
 }
