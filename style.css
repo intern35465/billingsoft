@@ -196,3 +196,42 @@
     color:#ddd;
     line-height:25px;
 }
+
+
+/* Append these styles directly to the bottom of your style.css file */
+
+/* BIG LIVE COUNT NUMBER */
+.live-counter {
+    font-size: 38px;
+    font-weight: bold;
+    color: #ffffff;
+    margin: 5px 0 10px 0;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* WIDER STYLE MODIFIER FOR THE RECENT DATA FEED CARD */
+.card.recent-card {
+    width: 320px; /* Slightly wider to comfortably fit strings without wrapping text ugly */
+}
+
+/* HIGH-CONTRAST DYNAMIC TEXT */
+.recent-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Shortens abnormally long product names cleanly with three dots (...) */
+    margin-bottom: 8px;
+}
+
+.recent-meta {
+    font-size: 14px;
+    color: #bbb;
+    margin-top: 4px;
+}
+
+.recent-meta span {
+    color: #ff7200; /* Accents the SKU name and product count text with your custom neon brand orange */
+    font-weight: bold;
+}
