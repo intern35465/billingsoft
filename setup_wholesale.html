@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zbilz - Customize Wholesale Vendors</title>
+    
+    <script src="auth-guard.js"></script>
+
+    <link rel="stylesheet" href="stockinbound.css">
+    
+    <link rel="stylesheet" href="setup_wholesale.css?v=1">
+</head>
+<body>
+
+    <h1>Customize <span>Wholesale Vendors</span></h1>
+    <p class="admin-warning-subtitle">Authorized Admin Workspace: Edit profiles or purge business accounts</p>
+
+    <div class="admin-workspace">
+
+        <div class="control-panel">
+            <div class="search-box-wrapper">
+                <label for="searchId">Search Customer by ID</label>
+                <div class="search-row">
+                    <input type="text" id="searchId" placeholder="e.g. WHL-CID-821212">
+                    <button type="button" id="btnFetch">Fetch</button>
+                </div>
+            </div>
+
+            <form id="editVendorForm" class="disabled-form">
+                <label for="displayId">Customer Unique ID</label>
+                <input type="text" id="displayId" readonly class="read-only-input">
+
+                <label for="vendorName">Customer / Corporate Name</label>
+                <input type="text" id="vendorName" required placeholder="Update business entity title">
+
+                <label for="vendorContact">Contact Number</label>
+                <input type="number" id="vendorContact" required placeholder="Update active phone line">
+
+                <label for="vendorAddress">Operational Address</label>
+                <input type="text" id="vendorAddress" required placeholder="Update shipping or billing office location">
+
+                <label for="vendorGst">Customer GSTIN</label>
+                <input type="text" id="vendorGst" placeholder="Update company GST registration identifier">
+
+                <label for="vendorDiscount">Customer Discount Percentage (%)</label>
+                <input type="number" id="vendorDiscount" required placeholder="Adjust margin trade discount" min="0" max="100">
+
+                <div class="admin-button-group">
+                    <button type="submit" id="btnUpdate" class="btn-action btn-save">Update Record</button>
+                    <button type="button" id="btnDelete" class="btn-action btn-danger">Purge Account</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="registry-panel">
+            <h3>Wholesale Network Directory</h3>
+            <div class="table-scroll-container">
+                <div id="vendorLiveGrid">Connecting to merchant index registries...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div style="text-align: center; width: 100%; margin-top: 25px; position: relative; z-index: 2;">
+        <a href="setup.html" class="abort-panel-btn">Back to Setup Hub</a>
+    </div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
+    authDomain: "zbillz-f4798.firebaseapp.com",
+    databaseURL: "https://zbillz-f4798-default-rtdb.firebaseio.com",
+    projectId: "zbillz-f4798",
+    storageBucket: "zbillz-f4798.firebasestorage.app",
+    messagingSenderId: "495466751324",
+    appId: "1:495466751324:web:324e3440f13fad0acdcd99"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let completeVendors = {};
+let targetFirebaseKey = null; // Tracks targeted database reference string
+
+// REAL-TIME LISTENER FOR REGISTERED WHOLESALE MERCHANTS
+onValue(ref(db, "wholesale_vendors"), (snapshot) => {
+    completeVendors = {};
+    if (snapshot.exists()) {
+        completeVendors = snapshot.val();
+    }
+    renderLiveVendorGrid();
+});
+
+function renderLiveVendorGrid() {
+    const displayContainer = document.getElementById("vendorLiveGrid");
+    const keys = Object.keys(completeVendors);
+
+    if (keys.length === 0) {
+        displayContainer.innerHTML = "<p style='color: #aaa; text-align:center;'>No merchant accounts found in database directory.</p>";
+        return;
+    }
+
+    let gridHtml = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Customer ID</th>
+                    <th>Name</th>
+                    <th>Contact</th>
+                    <th>GSTIN</th>
+                    <th>Discount</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    keys.forEach(keyId => {
+        const vendor = completeVendors[keyId];
+        gridHtml += `
+            <tr onclick="quickSelectVendor('${vendor.customerId || ''}')" style="cursor: pointer;" title="Tap to pull into management desk">
+                <td style="color: #ff7200; font-weight: bold;">${vendor.customerId || 'N/A'}</td>
+                <td>${vendor.name || 'N/A'}</td>
+                <td>${vendor.phone || 'N/A'}</td>
+                <td>${vendor.gstin || 'N/A'}</td>
+                <td style="color: #55ff55; font-weight: bold;">${vendor.discountPercent || 0}%</td>
+            </tr>
+        `;
+    });
+
+    gridHtml += `</tbody></table>`;
+    displayContainer.innerHTML = gridHtml;
+}
+
+// TAP ROW INSTANT SHORTCUT UTILITY
+window.quickSelectVendor = function(idCode) {
+    document.getElementById("searchId").value = idCode;
+    fetchVendorToEditor();
+};
+
+document.getElementById("btnFetch").addEventListener("click", fetchVendorToEditor);
+
+function fetchVendorToEditor() {
+    const searchTarget = document.getElementById("searchId").value.trim().toUpperCase();
+    if (!searchTarget) { alert("Please input a Customer ID key query."); return; }
+
+    targetFirebaseKey = null;
+    let matchingData = null;
+
+    for (const keyId in completeVendors) {
+        if (completeVendors[keyId].customerId && completeVendors[keyId].customerId.toUpperCase() === searchTarget) {
+            targetFirebaseKey = keyId;
+            matchingData = completeVendors[keyId];
+            break;
+        }
+    }
+
+    if (targetFirebaseKey && matchingData) {
+        document.getElementById("displayId").value = matchingData.customerId;
+        document.getElementById("vendorName").value = matchingData.name || "";
+        document.getElementById("vendorContact").value = matchingData.phone || "";
+        document.getElementById("vendorAddress").value = matchingData.address || "";
+        document.getElementById("vendorGst").value = matchingData.gstin || "";
+        document.getElementById("vendorDiscount").value = matchingData.discountPercent || 0;
+
+        document.getElementById("editVendorForm").classList.remove("disabled-form");
+    } else {
+        alert("Query failed: Specified Customer ID doesn't exist inside directory index.");
+        clearEditorState();
+    }
+}
+
+function clearEditorState() {
+    targetFirebaseKey = null;
+    document.getElementById("editVendorForm").reset();
+    document.getElementById("displayId").value = "";
+    document.getElementById("editVendorForm").classList.add("disabled-form");
+}
+
+// UPDATE EVENT ROUTINES
+document.getElementById("editVendorForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!targetFirebaseKey) return;
+
+    const modifiedPayload = {
+        name: document.getElementById("vendorName").value.trim(),
+        phone: document.getElementById("vendorContact").value,
+        address: document.getElementById("vendorAddress").value.trim(),
+        gstin: document.getElementById("vendorGst").value.trim().toUpperCase() || "N/A",
+        discountPercent: Number(document.getElementById("vendorDiscount").value)
+    };
+
+    try {
+        await update(ref(db, `wholesale_vendors/${targetFirebaseKey}`), modifiedPayload);
+        alert("Merchant account data record amended successfully.");
+        clearEditorState();
+    } catch (err) {
+        alert("Transaction Aborted: " + err.message);
+    }
+});
+
+// ACCOUNT DELETION ROUTINES
+document.getElementById("btnDelete").addEventListener("click", async () => {
+    if (!targetFirebaseKey) return;
+
+    const confirmation = confirm("CRITICAL ACCREDITATION REMOVAL:\nAre you entirely sure you want to drop this merchant account entirely from the system records?");
+    if (!confirmation) return;
+
+    try {
+        await remove(ref(db, `wholesale_vendors/${targetFirebaseKey}`));
+        alert("Merchant entity completely unlinked from network core architecture.");
+        clearEditorState();
+        document.getElementById("searchId").value = "";
+    } catch (err) {
+        alert("Purge operation rejected: " + err.message);
+    }
+});
+
+</script>
+
+</body>
+</html>
