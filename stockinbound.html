@@ -1,111 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Stock Inbound</title>
-    <link rel="stylesheet" href="stockinbound.css">
 
-<script src="auth-guard.js"></script>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+        }
+
+        form {
+            background: #f5f5f5;
+            padding: 20px;
+            width: 300px;
+            border-radius: 10px;
+            box-sizing: border-box;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"],
+        input[type="reset"] {
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
 
-    <div class="form-container">
-        <h1>Stock Inbound</h1>
+<h1>Stock Inbound</h1>
 
-        <form id="stockForm">
+<form id="stockForm">
 
-            <label>Product Name:</label><br>
-            <input type="text" id="productName" placeholder="Enter product name" required>
+    <input type="text" id="productName" placeholder="Product Name" required>
+    <input type="text" id="description" placeholder="Description">
+    <input type="number" id="quantityGrams" placeholder="Quantity (grams or boxes)" required>
+    <input type="number" id="productCount" placeholder="No. of Products" required>
+    <input type="number" id="price" placeholder="Price" required>
 
-            <label>Description:</label><br>
-            <input type="text" id="description" placeholder="Enter product description">
+    <input type="text" id="skuBox" readonly>
 
-            <label>Product Quantity:</label><br>
-            <input type="number" id="quantityGrams" placeholder="Enter quantity" required>
+    <input type="submit" value="Submit">
+    <input type="reset" value="Clear">
 
-            <label>No. of Products:</label><br>
-            <input type="number" id="productCount" placeholder="Enter number of products" required>
+</form>
 
-            <label>Price per piece:</label><br>
-            <input type="number" id="price" placeholder="Enter price" required>
+<script type="module">
 
-            <label>SKU:</label><br>
-            <input type="text" id="skuBox" readonly placeholder="Auto generated SKU">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-            <div class="button-group">
-                <input type="submit" value="Submit">
-                <input type="reset" value="Clear">
-            </div>
+const firebaseConfig = {
+    apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
+    authDomain: "zbillz-f4798.firebaseapp.com",
+    databaseURL: "https://zbillz-f4798-default-rtdb.firebaseio.com",
+    projectId: "zbillz-f4798",
+    storageBucket: "zbillz-f4798.firebasestorage.app",
+    messagingSenderId: "495466751324",
+    appId: "1:495466751324:web:324e3440f13fad0acdcd99"
+};
 
-        </form>
-    </div>
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+// SKU system (SAFE - NO RESET BUTTON)
+let letter = localStorage.getItem("skuLetter") || "A";
+let number = Number(localStorage.getItem("skuNumber")) || 111;
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
-            authDomain: "zbillz-f4798.firebaseapp.com",
-            databaseURL: "https://zbillz-f4798-default-rtdb.firebaseio.com",
-            projectId: "zbillz-f4798",
-            storageBucket: "zbillz-f4798.firebasestorage.app",
-            messagingSenderId: "495466751324",
-            appId: "1:495466751324:web:324e3440f13fad0acdcd99",
-            measurementId: "G-8SZG4XLT9P"
-        };
+function generateSKU() {
+    document.getElementById("skuBox").value = letter + number;
+}
+generateSKU();
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+document.getElementById("stockForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-        let letter = "A";
-        let number = 111;
+    const sku = letter + number;
 
-        function generateSKU() {
-            const skuBox = document.getElementById("skuBox");
-            if (skuBox) skuBox.value = letter + number;
-        }
+    const data = {
+        productName: document.getElementById("productName").value,
+        description: document.getElementById("description").value,
+        quantityGrams: Number(document.getElementById("quantityGrams").value),
+        productCount: Number(document.getElementById("productCount").value),
+        price: Number(document.getElementById("price").value),
+        sku: sku
+    };
 
-        generateSKU();
+    await push(ref(db, "inventory"), data);
 
-        const form = document.getElementById('stockForm');
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
+    number++;
 
-            const currentSku = letter + number;
+    if (number > 999) {
+        number = 111;
+        if (letter === "A") letter = "B";
+        else if (letter === "B") letter = "C";
+    }
 
-            const stockData = {
-                productName: document.getElementById("productName").value,
-                description: document.getElementById("description").value,
-                quantityGrams: Number(document.getElementById("quantityGrams").value),
-                productCount: Number(document.getElementById("productCount").value),
-                price: Number(document.getElementById("price").value),
-                sku: currentSku
-            };
+    localStorage.setItem("skuLetter", letter);
+    localStorage.setItem("skuNumber", number);
 
-            try {
-                await push(ref(db, 'inventory'), stockData);
-                alert(`Successfully saved stock for SKU: ${currentSku}`);
+    e.target.reset();
+    generateSKU();
 
-                number++;
-                if (number > 999) {
-                    number = 111;
-                    if (letter == "A") letter = "B";
-                    else if (letter == "B") letter = "C";
-                }
+    alert("Product Saved Successfully!");
+});
 
-                form.reset();
-                generateSKU();
-
-            } catch (error) {
-                console.error("Error pushing to Firebase Realtime Database: ", error);
-                alert("Failed to save data. Make sure database rules are published.");
-            }
-        });
-    </script>
+</script>
 
 </body>
-
 </html>
