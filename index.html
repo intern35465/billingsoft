@@ -3,6 +3,9 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Zbilz - Inventory Dashboard</title>
+    
+    <script src="auth-guard.js"></script>
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -18,14 +21,14 @@
                     <li><a href="warehouse.html">INVENTORY</a></li>
                     <li><a href="billing.html">BILLING</a></li>
                     <li><a href="invoice.html">INVOICE TRACKING</a></li>
-                    <li><a href="setup.html">SETUP</a></li>
+                    <li id="adminSetupNav"><a href="setup.html">SETUP</a></li>
                 </ul>
             </div>
         </div>
 
         <div class="content">
             <h1>Stock <span>Management</span></h1>
-            <p>Monitor your warehouse assets, track inventory inflow in real-time, generate automated unique SKUs, and handle customer billing instantly from a unified cloud database ecosystem.</p>
+            <p>Monitor warehouse metrics, observe system assets, and process customer ledger tracks instantly from a centralized dashboard matrix.</p>
             <button class="btn" onclick="window.location.href='warehouse.html'">Manage Stock</button>
         </div>
 
@@ -46,6 +49,13 @@
             </div>
         </div>
     </div>
+
+    <script>
+        if (localStorage.getItem("userRole") !== "admin") {
+            const setupNavOption = document.getElementById("adminSetupNav");
+            if (setupNavOption) setupNavOption.style.display = "none";
+        }
+    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -70,41 +80,27 @@
         const recentSkuBox = document.getElementById('recentSku');
         const recentCountBox = document.getElementById('recentCount');
 
-        // Capture live database changes instantly
         const inventoryRef = ref(db, 'inventory');
         onValue(inventoryRef, (snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
-                
-                // 1. MATH: Calculate sum of all counts
                 let cumulativeStock = 0;
                 Object.values(data).forEach(item => {
-                    if (item.productCount) {
-                        cumulativeStock += Number(item.productCount);
-                    }
+                    if (item.productCount) cumulativeStock += Number(item.productCount);
                 });
                 totalQuantityBox.innerText = cumulativeStock;
 
-                // 2. RECENT ACTIVITY: Snatch the very last entry array key
                 const keys = Object.keys(data);
                 const lastKey = keys[keys.length - 1]; 
                 const lastItem = data[lastKey];
 
-                // Inject recent item data to the UI elements
                 recentNameBox.innerText = lastItem.productName || "No Name";
                 recentSkuBox.innerText = lastItem.sku || "--";
                 recentCountBox.innerText = lastItem.productCount || "0";
-
             } else {
                 totalQuantityBox.innerText = "0";
                 recentNameBox.innerText = "Warehouse Empty";
-                recentSkuBox.innerText = "--";
-                recentCountBox.innerText = "--";
             }
-        }, (error) => {
-            console.error("Firebase connection error: ", error);
-            totalQuantityBox.innerText = "ERR";
-            recentNameBox.innerText = "Error Loading Feed";
         });
     </script>
 </body>
