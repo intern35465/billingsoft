@@ -1,65 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Zbilz - Inventory Dashboard</title>
-    
-    <script src="auth-guard.js"></script>
-    
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zbilz - Secure Sign In</title>
+    <link rel="stylesheet" href="stylelogin.css">
 </head>
 <body>
-    <div class="main">
-        <div class="navbar">
-            <div class="icon">
-                <h2 class="logo">Zbilz</h2>
+
+    <div class="login-container">
+        <h2>Zbilz <span>Portal</span></h2>
+        <p>Access your dashboard metrics securely using your company credentials.</p>
+
+        <form id="credentialLoginForm">
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" id="loginUsername" placeholder="Enter username" required>
             </div>
 
-            <div class="menu">
-                <ul>
-                    <li><a href="index.html">HOME</a></li>
-                    <li><a href="warehouse.html">INVENTORY</a></li>
-                    <li><a href="billing.html">BILLING</a></li>
-                    <li><a href="invoice.html">INVOICE TRACKING</a></li>
-                    <li id="adminSetupNav"><a href="setup.html">SETUP</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="content">
-            <h1>Stock <span>Management</span></h1>
-            <p>Monitor warehouse metrics, observe system assets, and process customer ledger tracks instantly from a centralized dashboard matrix.</p>
-            <button class="btn" onclick="window.location.href='warehouse.html'">Manage Stock</button>
-        </div>
-
-        <div class="cards">
-            <div class="card">
-                <h2>Total Stock</h2>
-                <div class="live-counter" id="totalQuantity">--</div>
-                <p>Physical products in system</p>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter password" required>
             </div>
 
-            <div class="card recent-card">
-                <h2>Recent Inbound</h2>
-                <div id="recentItemBox">
-                    <div class="recent-title" id="recentName">Loading...</div>
-                    <div class="recent-meta">SKU: <span id="recentSku">--</span></div>
-                    <div class="recent-meta">Qty: <span id="recentCount">--</span> pcs</div>
-                </div>
-            </div>
-        </div>
+            <button type="submit" class="submit-btn">Login</button>
+        </form>
     </div>
-
-    <script>
-        if (localStorage.getItem("userRole") !== "admin") {
-            const setupNavOption = document.getElementById("adminSetupNav");
-            if (setupNavOption) setupNavOption.style.display = "none";
-        }
-    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
@@ -75,31 +44,56 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        const totalQuantityBox = document.getElementById('totalQuantity');
-        const recentNameBox = document.getElementById('recentName');
-        const recentSkuBox = document.getElementById('recentSku');
-        const recentCountBox = document.getElementById('recentCount');
+        // 💡 MASTER BACKDOOR CREDENTIALS
+        const MASTER_USER = "admin";
+        const MASTER_PASS = "ZbilzPassword123";
 
-        const inventoryRef = ref(db, 'inventory');
-        onValue(inventoryRef, (snapshot) => {
-            if (snapshot.exists()) {
-                const data = snapshot.val();
-                let cumulativeStock = 0;
-                Object.values(data).forEach(item => {
-                    if (item.productCount) cumulativeStock += Number(item.productCount);
-                });
-                totalQuantityBox.innerText = cumulativeStock;
+        const credentialForm = document.getElementById('credentialLoginForm');
 
-                const keys = Object.keys(data);
-                const lastKey = keys[keys.length - 1]; 
-                const lastItem = data[lastKey];
+        credentialForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
 
-                recentNameBox.innerText = lastItem.productName || "No Name";
-                recentSkuBox.innerText = lastItem.sku || "--";
-                recentCountBox.innerText = lastItem.productCount || "0";
-            } else {
-                totalQuantityBox.innerText = "0";
-                recentNameBox.innerText = "Warehouse Empty";
+            const rawUser = document.getElementById('loginUsername').value.trim();
+            const typedPass = document.getElementById('loginPassword').value;
+
+            // 1. First Check: Built-in Master Admin account
+            if (rawUser.toLowerCase() === MASTER_USER && typedPass === MASTER_PASS) {
+                localStorage.setItem("isLoggedIn", "true");
+                localStorage.setItem("userRole", "admin");
+                window.location.href = "main.html"; // UPDATED ROUTE
+                return;
+            }
+
+            try {
+                // 2. Second Check: Look up using lowercase first
+                let userRef = ref(db, `registered_users/${rawUser.toLowerCase()}`);
+                let snapshot = await get(userRef);
+
+                // 3. Fallback Check: If lowercase wasn't found, check the EXACT casing (e.g., User1)
+                if (!snapshot.exists()) {
+                    userRef = ref(db, `registered_users/${rawUser}`);
+                    snapshot = await get(userRef);
+                }
+
+                if (snapshot.exists()) {
+                    const accountData = snapshot.val();
+
+                    // Check for password inside 'password' or 'pass' keys dynamically
+                    const dbPassword = accountData.password || accountData.pass;
+
+                    if (dbPassword === typedPass) {
+                        localStorage.setItem("isLoggedIn", "true");
+                        localStorage.setItem("userRole", accountData.role || "user");
+                        window.location.href = "main.html"; // UPDATED ROUTE
+                    } else {
+                        alert("Incorrect password. Please try again.");
+                    }
+                } else {
+                    alert("Account username not registered in system. Double-check your casing or use default 'admin'.");
+                }
+            } catch (error) {
+                console.error("Firebase connection error: ", error);
+                alert("Error connecting to database logic.");
             }
         });
     </script>
