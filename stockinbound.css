@@ -1,0 +1,150 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+/* BODY */
+
+body{
+    min-height:100vh;
+    background-image:url('https://res.cloudinary.com/ddff5thvj/image/upload/v1779987780/bbyh3a5rllxtnuhn3ljv.jpg');
+    background-size:cover;
+    background-position:center;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    position:relative;
+    padding:40px;
+}
+
+/* DARK OVERLAY */
+
+body::before{
+    content:'';
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.7);
+    top:0;
+    left:0;
+}
+
+/* FORM CONTAINER */
+
+.form-container{
+    position:relative;
+    z-index:2;
+    width:420px;
+}
+
+/* TITLE */
+
+h1{
+    color:white;
+    text-align:center;
+    margin-bottom:30px;
+    font-size:40px;
+
+    text-shadow:
+    0 0 10px #ff7200,
+    0 0 20px #ff7200;
+}
+
+/* FORM */
+
+form{
+    background:rgba(255,255,255,0.08);
+    padding:35px;
+    border-radius:20px;
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.1);
+
+    box-shadow:
+    0 0 10px rgba(0,0,0,0.5);
+}
+
+/* LABEL */
+
+label{
+    color:white;
+    font-size:15px;
+    font-weight:bold;
+}
+
+/* INPUTS */
+
+input[type="text"],
+input[type="number"]{
+    width:100%;
+    padding:13px;
+    margin-top:8px;
+    margin-bottom:20px;
+    border:none;
+    border-bottom:2px solid #ff7200;
+    background:transparent;
+    color:white;
+    outline:none;
+    font-size:15px;
+}
+
+/* PLACEHOLDER */
+
+input::placeholder{
+    color:#ccc;
+}
+
+/* SKU BOX */
+
+#skuBox{
+    color:#ff7200;
+    font-weight:bold;
+}
+
+/* BUTTON SECTION */
+
+.button-group{
+    display:flex;
+    gap:15px;
+}
+
+/* BUTTONS */
+
+input[type="submit"],
+input[type="reset"]{
+    flex:1;
+    padding:13px;
+    border:none;
+    border-radius:10px;
+    color:white;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:bold;
+    transition:0.4s;
+}
+
+/* SUBMIT */
+
+input[type="submit"]{
+    background:#ff7200;
+}
+
+/* RESET */
+
+input[type="reset"]{
+    background:#444;
+}
+
+/* HOVER EFFECT */
+
+input[type="submit"]:hover,
+input[type="reset"]:hover{
+
+    transform:scale(1.05);
+
+    box-shadow:
+    0 0 10px #ff7200,
+    0 0 20px #ff7200,
+    0 0 40px #ff7200;
+}
