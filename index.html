@@ -12,6 +12,53 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            position: relative;
+        }
+
+        /* 1. STYLING FOR YOUR NEW LIVE INVENTORY CARDS */
+        .dashboard-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            border-radius: 16px;
+            width: 260px;
+            text-align: center;
+            color: #ffffff;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-card h3 {
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            color: #ff9f43; /* Matches your orange accent theme */
+        }
+
+        .stat-card .number {
+            font-size: 42px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .stat-card p {
+            font-size: 13px;
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -25,17 +72,81 @@
             <div class="menu">
                 <ul>
                     <li><a href="index.html">HOME</a></li>
-                    
                     <li><a href="warehouse.html">INVENTORY</a></li>
-                    
                     <li><a href="billing.html">BILLING</a></li>
-                    
                     <li><a href="invoice.html">INVOICE TRACKING</a></li>
-                    
                     <li><a href="setup.html">SETUP</a></li>
-</ul>
-</div>
-</div>
-</div>
+                </ul>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="stat-card">
+                <h3>Total Unique SKUs</h3>
+                <div class="number" id="totalSkus">--</div>
+                <p>Different items registered</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Total Physical Stock</h3>
+                <div class="number" id="totalQuantity">--</div>
+                <p>Total items in warehouse</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
+            authDomain: "zbillz-f4798.firebaseapp.com",
+            databaseURL: "https://zbillz-f4798-default-rtdb.firebaseio.com",
+            projectId: "zbillz-f4798",
+            storageBucket: "zbillz-f4798.firebasestorage.app",
+            messagingSenderId: "495466751324",
+            appId: "1:495466751324:web:324e3440f13fad0acdcd99",
+            measurementId: "G-8SZG4XLT9P"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const totalSkusBox = document.getElementById('totalSkus');
+        const totalQuantityBox = document.getElementById('totalQuantity');
+
+        // Listen to the 'inventory' data node in real-time
+        const inventoryRef = ref(db, 'inventory');
+        onValue(inventoryRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                
+                // Calculate numbers
+                const uniqueSkusCount = Object.keys(data).length; // How many entries exist
+                
+                let sumOfAllProducts = 0;
+                
+                // Loop through every item and add up their product counts
+                Object.values(data).forEach(item => {
+                    if (item.productCount) {
+                        sumOfAllProducts += Number(item.productCount);
+                    }
+                });
+
+                // Send numbers to the screen
+                totalSkusBox.innerText = uniqueSkusCount;
+                totalQuantityBox.innerText = sumOfAllProducts;
+            } else {
+                // If database is completely empty
+                totalSkusBox.innerText = "0";
+                totalQuantityBox.innerText = "0";
+            }
+        }, (error) => {
+            console.error("Error loading dashboard numbers: ", error);
+            totalSkusBox.innerText = "Error";
+            totalQuantityBox.innerText = "Error";
+        });
+    </script>
 </body>
 </html>
