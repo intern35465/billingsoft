@@ -1,78 +1,30 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>Peak</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zbilz - Inventory View</title>
+    
+    <script src="auth-guard.js"></script>
 
-    <style>
-        body {
-            font-family: Arial;
-            padding: 20px;
-            background: #f4f4f4;
-        }
-
-        .box {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-        }
-
-        button {
-            width: 100%;
-            margin-top: 10px;
-            padding: 10px;
-            cursor: pointer;
-        }
-
-        .searchBtn {
-            background: blue;
-            color: white;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: center;
-        }
-
-        th {
-            background: #ddd;
-        }
-    </style>
+    <link rel="stylesheet" href="peak.css">
 </head>
-
 <body>
 
-<h1>Peak</h1>
+    <h1>Peak <span>Inventory</span></h1>
 
-<div class="box">
+    <div class="box">
+        <input type="text" id="searchSku" placeholder="Enter SKU (e.g., SKU-X7K21)">
+        <button class="searchBtn" onclick="searchProduct()">Search Database</button>
 
-    <input type="text" id="searchSku" placeholder="Enter SKU">
-    <button class="searchBtn" onclick="searchProduct()">Search</button>
+        <div class="result">Result queries will appear here...</div>
+    </div>
 
-    <div class="result">Result will appear here</div>
-
-</div>
-
-<div class="box">
-
-    <h3>All Products</h3>
-
-    <div id="tableArea">Loading...</div>
-
-</div>
+    <div class="box">
+        <h3>All Stock Items</h3>
+        <div id="tableArea">Connecting to real-time engine...</div>
+        
+        <a href="index.html" class="back-btn">Back to Home</a>
+    </div>
 
 <script type="module">
 
@@ -94,33 +46,34 @@ const db = getDatabase(app);
 
 let products = [];
 
-// LOAD DATA FROM FIREBASE
+// FETCH REALTIME UPDATES FROM FIREBASE
 onValue(ref(db, "inventory"), (snapshot) => {
-
     products = [];
 
-    snapshot.forEach(item => {
-        products.push(item.val());
-    });
+    if (snapshot.exists()) {
+        snapshot.forEach(item => {
+            products.push(item.val());
+        });
+    }
 
     renderTable();
 });
 
+// BUILD STYLISH METRIC DATA TABLE
 function renderTable() {
-
     let box = document.getElementById("tableArea");
 
     if (products.length === 0) {
-        box.innerHTML = "No products available";
+        box.innerHTML = "<p style='color: #aaa;'>No active products found in warehouse.</p>";
         return;
     }
 
     let html = `
         <table>
             <tr>
-                <th>Name</th>
-                <th>Quantity (g)</th>
-                <th>SKU</th>
+                <th>Product Name</th>
+                <th>Quantity (g / b)</th>
+                <th>SKU Code</th>
             </tr>
     `;
 
@@ -129,38 +82,41 @@ function renderTable() {
             <tr>
                 <td>${p.productName}</td>
                 <td>${p.quantityGrams}</td>
-                <td>${p.sku}</td>
+                <td style="color: #ff7200; font-weight: bold;">${p.sku}</td>
             </tr>
         `;
     });
 
     html += `</table>`;
-
     box.innerHTML = html;
 }
 
-// SEARCH
+// EXECUTE UNIQUE SKU DISCOVERY SEARCH
 window.searchProduct = function () {
-
-    let sku = document.getElementById("searchSku").value;
-
-    let found = products.find(p => p.sku === sku);
-
+    let typedSku = document.getElementById("searchSku").value.trim().toUpperCase();
     let box = document.querySelector(".result");
 
+    if (!typedSku) {
+        box.innerHTML = "⚠️ Please type an item SKU key first.";
+        return;
+    }
+
+    // Dynamic case-insensitive or exact lookup query matching
+    let found = products.find(p => p.sku && p.sku.toUpperCase() === typedSku);
+
     if (!found) {
-        box.innerHTML = "❌ Product not found";
+        box.innerHTML = "❌ Match not found. Verify SKU identifier sequence.";
         return;
     }
 
     box.innerHTML = `
-        <b>Product Found</b><br><br>
-        Name: ${found.productName}<br>
-        Description: ${found.description}<br>
-        Quantity: ${found.quantityGrams}<br>
-        No: ${found.productCount}<br>
-        Price: ${found.price}<br>
-        SKU: ${found.sku}
+        <span style="color: #ff7200; font-weight: bold; font-size: 16px;">📦 Product Discovered</span><br><br>
+        <b>Name:</b> ${found.productName}<br>
+        <b>Description:</b> ${found.description || 'N/A'}<br>
+        <b>Stock Quantity:</b> ${found.quantityGrams} grams/boxes<br>
+        <b>Total Products Count:</b> ${found.productCount}<br>
+        <b>Unit Costing:</b> ₹${found.price}<br>
+        <b>System SKU:</b> <span style="color: #ff7200;">${found.sku}</span>
     `;
 };
 
