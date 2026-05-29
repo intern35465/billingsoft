@@ -3,13 +3,29 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zbilz - Secure Sign In</title>
-    <link rel="stylesheet" href="stylelogin.css">
+    <link rel="stylesheet" href="login.css">
 </head>
 <body>
 
     <div class="login-container">
         <h2>Zbilz <span>Portal</span></h2>
-        <p>Access your dashboard metrics securely using your authorized company Google account.</p>
+        <p>Access your dashboard metrics securely using your company credentials.</p>
+
+        <form id="credentialLoginForm">
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" id="loginUsername" placeholder="Enter username" required>
+            </div>
+            
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter password" required>
+            </div>
+
+            <button type="submit" class="submit-btn">Login</button>
+        </form>
+
+        <div class="divider">or</div>
 
         <button id="googleLoginBtn" class="login-btn">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -41,39 +57,51 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
-        // ⚠️ TYPE YOUR CHOSEN ADMIN GOOGLE EMAIL LOWERCASE HERE
+        // 1. SET YOUR CHOSEN ADMIN USERNAME & PASSWORD HERE
+        const ADMIN_USERNAME = "admin"; 
+        const ADMIN_PASSWORD = "ZbilzPassword123"; // Change this to whatever password you want!
+
+        // Google Admin Accounts List
         const ADMIN_ACCOUNTS = ["yourusername@gmail.com"]; 
 
-        const loginBtn = document.getElementById('googleLoginBtn');
+        // --- OPTION A: TRADITIONAL LOGIN HANDLING ---
+        const credentialForm = document.getElementById('credentialLoginForm');
+        credentialForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            
+            const typedUser = document.getElementById('loginUsername').value.trim();
+            const typedPass = document.getElementById('loginPassword').value;
 
-        if(loginBtn) {
-            loginBtn.addEventListener('click', () => {
-                // Let us know the button click registered physically
-                console.log("Button tapped. Contacting Firebase Auth standard gateway...");
+            if (typedUser === ADMIN_USERNAME && typedPass === ADMIN_PASSWORD) {
+                localStorage.setItem("isLoggedIn", "true");
+                localStorage.setItem("userRole", "admin");
+                window.location.href = "index.html";
+            } else {
+                alert("Invalid Admin Username or Password. Please try again.");
+            }
+        });
 
-                signInWithPopup(auth, provider)
-                    .then((result) => {
-                        const user = result.user;
-                        
-                        localStorage.setItem("isLoggedIn", "true");
-                        
-                        if (user.email && ADMIN_ACCOUNTS.includes(user.email.toLowerCase())) {
-                            localStorage.setItem("userRole", "admin");
-                        } else {
-                            localStorage.setItem("userRole", "user");
-                        }
+        // --- OPTION B: GOOGLE SIGN-IN HANDLING ---
+        const googleBtn = document.getElementById('googleLoginBtn');
+        googleBtn.addEventListener('click', () => {
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    const user = result.user;
+                    localStorage.setItem("isLoggedIn", "true");
+                    
+                    if (user.email && ADMIN_ACCOUNTS.includes(user.email.toLowerCase())) {
+                        localStorage.setItem("userRole", "admin");
+                    } else {
+                        localStorage.setItem("userRole", "user");
+                    }
 
-                        window.location.href = "index.html";
-                    })
-                    .catch((error) => {
-                        console.error("Firebase Auth Error Details: ", error);
-                        // This alert box will intercept the exact blocking issue if it fails!
-                        alert("Firebase Login Error: " + error.message);
-                    });
-            });
-        } else {
-            console.error("Critical Error: HTML button element with ID 'googleLoginBtn' missing.");
-        }
+                    window.location.href = "index.html";
+                })
+                .catch((error) => {
+                    console.error("Google login failed: ", error);
+                    alert("Google Login Error: " + error.message);
+                });
+        });
     </script>
 </body>
 </html>
