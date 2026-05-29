@@ -221,7 +221,7 @@
             text-align: left;
         }
 
-        /* HORIZONTAL SCROLL CONTROLLER - STOPS SIDE SQUISHING */
+        /* HORIZONTAL SCROLL CONTROLLER */
         .table-scroll-container {
             width: 100%;
             overflow-x: auto;
@@ -235,7 +235,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 400px; /* Protects data structure spacing on mobile viewports */
+            min-width: 400px;
         }
 
         th, td {
@@ -399,7 +399,7 @@ function renderLiveInventoryGrid() {
     keys.forEach(keyId => {
         const item = completeInventory[keyId];
         
-        // CHECK ALL VARIATIONS FOR DATABASE NOMENCLATURES
+        // SKU VARIATION CHECK MATRIX
         const actualSku = item.sku || 
                           item.productSku || 
                           item.product_sku || 
@@ -409,14 +409,25 @@ function renderLiveInventoryGrid() {
                           'N/A';
         
         const actualName = item.productName || item.name || item.itemName || 'N/A';
-        const actualQty = item.quantity !== undefined ? item.quantity : (item.qty || 0);
-        const actualPrice = item.retailPrice || item.price || item.unitPrice || 0;
+        
+        // 🔥 CRITICAL QUANTITY FALLBACK CHECKER (Checks productQuantity, pqty, stock, etc.)
+        let actualQty = 0;
+        if (item.quantity !== undefined) actualQty = item.quantity;
+        else if (item.qty !== undefined) actualQty = item.qty;
+        else if (item.productQuantity !== undefined) actualQty = item.productQuantity;
+        else if (item.productqty !== undefined) actualQty = item.productqty;
+        else if (item.pqty !== undefined) actualQty = item.pqty;
+        else if (item.stock !== undefined) actualQty = item.stock;
+        else if (item.initialQty !== undefined) actualQty = item.initialQty;
+
+        // PRICE VARIATION CHECK MATRIX
+        const actualPrice = item.retailPrice || item.price || item.unitPrice || item.productPrice || 0;
 
         gridHtml += `
             <tr onclick="quickSelectSku('${actualSku}')" style="cursor: pointer;" title="Click to auto-populate editor tool">
                 <td style="color: #ff7200; font-weight: bold;">${actualSku}</td>
                 <td>${actualName}</td>
-                <td style="font-weight: bold; color: ${Number(actualQty) > 5 ? '#e0e0e0' : '#ff4444'}">${actualQty}</td>
+                <td style="font-weight: bold; color: ${Number(actualQty) > 0 ? '#55ff55' : '#ff4444'}">${actualQty}</td>
                 <td>₹${actualPrice}</td>
             </tr>
         `;
@@ -456,10 +467,20 @@ function fetchProductToEditor() {
     if (targetFirebaseKey && matchingData) {
         const structuralSku = matchingData.sku || matchingData.productSku || matchingData.product_sku || matchingData.itemSku || matchingData.skuCode || matchingData.id;
         
+        // Find correct quantity key structure to populate editor field
+        let targetQty = 0;
+        if (matchingData.quantity !== undefined) targetQty = matchingData.quantity;
+        else if (matchingData.qty !== undefined) targetQty = matchingData.qty;
+        else if (matchingData.productQuantity !== undefined) targetQty = matchingData.productQuantity;
+        else if (matchingData.productqty !== undefined) targetQty = matchingData.productqty;
+        else if (matchingData.pqty !== undefined) targetQty = matchingData.pqty;
+        else if (matchingData.stock !== undefined) targetQty = matchingData.stock;
+        else if (matchingData.initialQty !== undefined) targetQty = matchingData.initialQty;
+
         document.getElementById("displaySku").value = structuralSku;
         document.getElementById("stockName").value = matchingData.productName || matchingData.name || matchingData.itemName || "";
-        document.getElementById("stockQty").value = matchingData.quantity !== undefined ? matchingData.quantity : (matchingData.qty || 0);
-        document.getElementById("stockPrice").value = matchingData.retailPrice || matchingData.price || matchingData.unitPrice || 0;
+        document.getElementById("stockQty").value = targetQty;
+        document.getElementById("stockPrice").value = matchingData.retailPrice || matchingData.price || matchingData.unitPrice || matchingData.productPrice || 0;
 
         document.getElementById("editStockForm").classList.remove("disabled-form");
     } else {
@@ -483,16 +504,22 @@ document.getElementById("editStockForm").addEventListener("submit", async (e) =>
     const originalItem = completeInventory[targetFirebaseKey];
     const modifiedPayload = {};
 
+    // Match exact text properties found inside database node
     if (originalItem.productName !== undefined) modifiedPayload.productName = document.getElementById("stockName").value.trim();
     if (originalItem.name !== undefined) modifiedPayload.name = document.getElementById("stockName").value.trim();
     if (originalItem.itemName !== undefined) modifiedPayload.itemName = document.getElementById("stockName").value.trim();
 
     if (originalItem.quantity !== undefined) modifiedPayload.quantity = Number(document.getElementById("stockQty").value);
     if (originalItem.qty !== undefined) modifiedPayload.qty = Number(document.getElementById("stockQty").value);
+    if (originalItem.productQuantity !== undefined) modifiedPayload.productQuantity = Number(document.getElementById("stockQty").value);
+    if (originalItem.productqty !== undefined) modifiedPayload.productqty = Number(document.getElementById("stockQty").value);
+    if (originalItem.pqty !== undefined) modifiedPayload.pqty = Number(document.getElementById("stockQty").value);
+    if (originalItem.stock !== undefined) modifiedPayload.stock = Number(document.getElementById("stockQty").value);
 
     if (originalItem.retailPrice !== undefined) modifiedPayload.retailPrice = Number(document.getElementById("stockPrice").value);
     if (originalItem.price !== undefined) modifiedPayload.price = Number(document.getElementById("stockPrice").value);
     if (originalItem.unitPrice !== undefined) modifiedPayload.unitPrice = Number(document.getElementById("stockPrice").value);
+    if (originalItem.productPrice !== undefined) modifiedPayload.productPrice = Number(document.getElementById("stockPrice").value);
 
     try {
         await update(ref(db, `inventory/${targetFirebaseKey}`), modifiedPayload);
