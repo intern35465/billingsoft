@@ -1,6 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webpage Design</title>
-    <b>hello</b>
+
+    <title>Inventory Section</title>
+
+    <style>
+
+        body{
+            margin:0;
+            font-family:Arial;
+            background-color:#f4f4f4;
+            padding:40px;
+        }
+
+        .cards{
+            display:flex;
+            justify-content:center;
+            gap:30px;
+            flex-wrap:wrap;
+        }
+
+        .card{
+            width:280px;
+            background-color:white;
+            padding:25px;
+            border-radius:12px;
+            box-sizing:border-box;
+            text-align:center;
+        }
+
+        .card a{
+            display:inline-block;
+            padding:12px 20px;
+            background-color:blue;
+            color:white;
+            text-decoration:none;
+            border-radius:6px;
+            transition:0.3s;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Inventory Section</h1>
+
+    <div class="cards">
+
+        <div class="card">
+
+            <h2>STOCKS INBOUND</h2>
+
+            <p>
+                Manage all your stock entries 
+            </p>
+
+            <a href="../stockinbound/stockinbound.html">
+                Stock Inbound
+            </a>
+
+        </div>
+
+        <div class="card">
+
+            <h2>PEAK</h2>
+
+            <p>
+                Check stock trends and insights at a glance
+            </p>
+
+            <a href="../peak/peak.html">
+                Open Peak
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
