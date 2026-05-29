@@ -3,11 +3,8 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zbilz - Personnel Registration</title>
-    
     <script src="auth-guard.js"></script>
-
     <link rel="stylesheet" href="stockinbound.css">
-    
     <link rel="stylesheet" href="register_staff.css?v=1">
 </head>
 <body>
@@ -16,10 +13,8 @@
     <p class="admin-warning-subtitle">Authorized Admin Workspace: Register and view active system operators</p>
 
     <div class="admin-workspace">
-
         <div class="control-panel">
             <form id="staffRegisterForm" style="width: 100%; max-width: 100%;">
-                
                 <label for="staffUidBox">Staff System ID (Auto)</label>
                 <input type="text" id="staffUidBox" readonly style="color: #ff7200; font-weight: bold;">
 
@@ -53,13 +48,12 @@
                 <div id="staffLiveGrid">Connecting to authorization node...</div>
             </div>
         </div>
-
     </div>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+// Changed 'push' to 'set' for clean, direct username routing paths
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
@@ -76,7 +70,6 @@ const db = getDatabase(app);
 
 let staffList = [];
 
-// ⚡ NON-REPEATING STAFF ID GENERATOR
 function generateUniqueStaffID() {
     const timestampMillis = Date.now().toString();
     const shortNum = timestampMillis.slice(-5); 
@@ -139,17 +132,20 @@ function renderStaffGrid() {
 document.getElementById("staffRegisterForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const usernameInput = document.getElementById("staffName").value.trim();
+
     const dataPayload = {
         staffId: document.getElementById("staffUidBox").value,
-        username: document.getElementById("staffName").value.trim(),
+        username: usernameInput,
         phone: document.getElementById("staffContact").value,
         role: document.getElementById("staffRole").value,
-        password: document.getElementById("staffPassword").value, // Accessible context security payload node
+        password: document.getElementById("staffPassword").value,
         registeredOn: new Date().toLocaleString()
     };
 
     try {
-        await push(ref(db, "users"), dataPayload);
+        // FIXED: Using lowercase username as a clean database path key instead of random push strings
+        await set(ref(db, `users/${usernameInput.toLowerCase()}`), dataPayload);
         e.target.reset();
         generateUniqueStaffID();
         alert("System Operator Authorization Keys Created Successfully!");
@@ -161,7 +157,6 @@ document.getElementById("staffRegisterForm").addEventListener("submit", async (e
 document.getElementById("staffRegisterForm").addEventListener("reset", () => {
     setTimeout(generateUniqueStaffID, 10);
 });
-
 </script>
 
 </body>
