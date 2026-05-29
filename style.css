@@ -1,1 +1,8 @@
-h
+.nav-item:hover i {
+  color: var(--orange);
+  text-shadow:
+    0 0 8px var(--orange),
+    0 0 20px rgba(240,120,0,.55),
+    0 0 40px rgba(240,120,0,.25);
+  transform: scale(1.18);
+}
