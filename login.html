@@ -9,7 +9,7 @@
 
     <div class="login-container">
         <h2>Zbilz <span>Portal</span></h2>
-        <p>Access your billing and stock logistics network securely using an authorized Google profile.</p>
+        <p>Access your dashboard metrics securely using your authorized company Google account.</p>
 
         <button id="googleLoginBtn" class="login-btn">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -41,30 +41,39 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
-        // ⚠️ PUT YOUR ACTUAL GOOGLE EMAIL ADDRESS IN THIS ARRAY BELOW
+        // ⚠️ TYPE YOUR CHOSEN ADMIN GOOGLE EMAIL LOWERCASE HERE
         const ADMIN_ACCOUNTS = ["yourusername@gmail.com"]; 
 
-        document.getElementById('googleLoginBtn').addEventListener('click', () => {
-            signInWithPopup(auth, provider)
-                .then((result) => {
-                    const user = result.user;
-                    
-                    localStorage.setItem("isLoggedIn", "true");
-                    
-                    // Assign access role depending on email authentication match
-                    if (ADMIN_ACCOUNTS.includes(user.email.toLowerCase())) {
-                        localStorage.setItem("userRole", "admin");
-                    } else {
-                        localStorage.setItem("userRole", "user");
-                    }
+        const loginBtn = document.getElementById('googleLoginBtn');
 
-                    window.location.href = "index.html";
-                })
-                .catch((error) => {
-                    console.error("Login authentication failure: ", error);
-                    alert("Authentication cancelled or restricted by browser configuration.");
-                });
-        });
+        if(loginBtn) {
+            loginBtn.addEventListener('click', () => {
+                // Let us know the button click registered physically
+                console.log("Button tapped. Contacting Firebase Auth standard gateway...");
+
+                signInWithPopup(auth, provider)
+                    .then((result) => {
+                        const user = result.user;
+                        
+                        localStorage.setItem("isLoggedIn", "true");
+                        
+                        if (user.email && ADMIN_ACCOUNTS.includes(user.email.toLowerCase())) {
+                            localStorage.setItem("userRole", "admin");
+                        } else {
+                            localStorage.setItem("userRole", "user");
+                        }
+
+                        window.location.href = "index.html";
+                    })
+                    .catch((error) => {
+                        console.error("Firebase Auth Error Details: ", error);
+                        // This alert box will intercept the exact blocking issue if it fails!
+                        alert("Firebase Login Error: " + error.message);
+                    });
+            });
+        } else {
+            console.error("Critical Error: HTML button element with ID 'googleLoginBtn' missing.");
+        }
     </script>
 </body>
 </html>
