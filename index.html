@@ -2,65 +2,8 @@
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Webpage Design</title>
+    <title>Zbilz - Inventory Dashboard</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .main {
-            width: 100%;
-            height: 100vh;
-            background-image: url('https://res.cloudinary.com/ddff5thvj/image/upload/v1779987780/bbyh3a5rllxtnuhn3ljv.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            position: relative;
-        }
-
-        /* 1. STYLING FOR YOUR NEW LIVE INVENTORY CARDS */
-        .dashboard-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            align-items: center;
-            width: 90%;
-            max-width: 800px;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 30px;
-            border-radius: 16px;
-            width: 260px;
-            text-align: center;
-            color: #ffffff;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        }
-
-        .stat-card h3 {
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            color: #ff9f43; /* Matches your orange accent theme */
-        }
-
-        .stat-card .number {
-            font-size: 42px;
-            font-weight: bold;
-            margin: 5px 0;
-        }
-
-        .stat-card p {
-            font-size: 13px;
-            opacity: 0.8;
-        }
-    </style>
 </head>
 <body>
     <div class="main">
@@ -80,17 +23,26 @@
             </div>
         </div>
 
-        <div class="dashboard-content">
-            <div class="stat-card">
-                <h3>Total Unique SKUs</h3>
-                <div class="number" id="totalSkus">--</div>
-                <p>Different items registered</p>
+        <div class="content">
+            <h1>Stock <span>Management</span></h1>
+            <p>Monitor your warehouse assets, track inventory inflow in real-time, generate automated unique SKUs, and handle customer billing instantly from a unified cloud database ecosystem.</p>
+            <button class="btn" onclick="window.location.href='warehouse.html'">Manage Stock</button>
+        </div>
+
+        <div class="cards">
+            <div class="card">
+                <h2>Total Stock</h2>
+                <div class="live-counter" id="totalQuantity">--</div>
+                <p>Physical products in system</p>
             </div>
 
-            <div class="stat-card">
-                <h3>Total Physical Stock</h3>
-                <div class="number" id="totalQuantity">--</div>
-                <p>Total items in warehouse</p>
+            <div class="card recent-card">
+                <h2>Recent Inbound</h2>
+                <div id="recentItemBox">
+                    <div class="recent-title" id="recentName">Loading...</div>
+                    <div class="recent-meta">SKU: <span id="recentSku">--</span></div>
+                    <div class="recent-meta">Qty: <span id="recentCount">--</span> pcs</div>
+                </div>
             </div>
         </div>
     </div>
@@ -113,39 +65,46 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        const totalSkusBox = document.getElementById('totalSkus');
         const totalQuantityBox = document.getElementById('totalQuantity');
+        const recentNameBox = document.getElementById('recentName');
+        const recentSkuBox = document.getElementById('recentSku');
+        const recentCountBox = document.getElementById('recentCount');
 
-        // Listen to the 'inventory' data node in real-time
+        // Capture live database changes instantly
         const inventoryRef = ref(db, 'inventory');
         onValue(inventoryRef, (snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
                 
-                // Calculate numbers
-                const uniqueSkusCount = Object.keys(data).length; // How many entries exist
-                
-                let sumOfAllProducts = 0;
-                
-                // Loop through every item and add up their product counts
+                // 1. MATH: Calculate sum of all counts
+                let cumulativeStock = 0;
                 Object.values(data).forEach(item => {
                     if (item.productCount) {
-                        sumOfAllProducts += Number(item.productCount);
+                        cumulativeStock += Number(item.productCount);
                     }
                 });
+                totalQuantityBox.innerText = cumulativeStock;
 
-                // Send numbers to the screen
-                totalSkusBox.innerText = uniqueSkusCount;
-                totalQuantityBox.innerText = sumOfAllProducts;
+                // 2. RECENT ACTIVITY: Snatch the very last entry array key
+                const keys = Object.keys(data);
+                const lastKey = keys[keys.length - 1]; 
+                const lastItem = data[lastKey];
+
+                // Inject recent item data to the UI elements
+                recentNameBox.innerText = lastItem.productName || "No Name";
+                recentSkuBox.innerText = lastItem.sku || "--";
+                recentCountBox.innerText = lastItem.productCount || "0";
+
             } else {
-                // If database is completely empty
-                totalSkusBox.innerText = "0";
                 totalQuantityBox.innerText = "0";
+                recentNameBox.innerText = "Warehouse Empty";
+                recentSkuBox.innerText = "--";
+                recentCountBox.innerText = "--";
             }
         }, (error) => {
-            console.error("Error loading dashboard numbers: ", error);
-            totalSkusBox.innerText = "Error";
-            totalQuantityBox.innerText = "Error";
+            console.error("Firebase connection error: ", error);
+            totalQuantityBox.innerText = "ERR";
+            recentNameBox.innerText = "Error Loading Feed";
         });
     </script>
 </body>
