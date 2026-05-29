@@ -1,1 +1,167 @@
-hik
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zbilz - Wholesale Registry</title>
+    
+    <script src="auth-guard.js"></script>
+
+    <link rel="stylesheet" href="stockinbound.css">
+    
+    <link rel="stylesheet" href="wholesale_billing.css">
+</head>
+<body>
+
+    <h1>Wholesale <span>Vendor Management</span></h1>
+
+    <div class="main-workspace">
+
+        <div class="form-panel">
+            <form id="vendorForm" style="width: 100%; max-width: 100%;">
+                
+                <label for="vendorIdBox">Customer Unique ID (Auto)</label>
+                <input type="text" id="vendorIdBox" readonly style="color: #ff7200; font-weight: bold;">
+
+                <label for="vendorName">Customer Name</label>
+                <input type="text" id="vendorName" placeholder="Enter corporate or individual name" required>
+
+                <label for="vendorContact">Contact Number</label>
+                <input type="number" id="vendorContact" placeholder="Enter phone terminal code" required>
+
+                <label for="vendorAddress">Contact Address</label>
+                <input type="text" id="vendorAddress" placeholder="Enter operational street address" required>
+
+                <label for="vendorGst">Customer GSTIN (Optional)</label>
+                <input type="text" id="vendorGst" placeholder="Enter company GST registration ID">
+
+                <label for="vendorDiscount">Customer Discount Percentage (%)</label>
+                <input type="number" id="vendorDiscount" placeholder="Enter trade discount (e.g. 10)" min="0" max="100" required>
+
+                <div class="button-group">
+                    <input type="submit" value="Register Vendor">
+                    <input type="reset" value="Clear Fields">
+                </div>
+
+                <input type="button" value="Back to Selector" onclick="window.location.href='billing.html'" style="background: #222; margin-top: 15px; width: 100%; border: none; border-radius: 10px; padding: 13px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.4s;">
+            </form>
+        </div>
+
+        <div class="table-panel">
+            <h3>Registered Wholesale Partners</h3>
+            <div class="table-scroll">
+                <div id="vendorTableArea">Connecting to real-time engine...</div>
+            </div>
+        </div>
+
+    </div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
+    authDomain: "zbillz-f4798.firebaseapp.com",
+    databaseURL: "https://zbillz-f4798-default-rtdb.firebaseio.com",
+    projectId: "zbillz-f4798",
+    storageBucket: "zbillz-f4798.firebasestorage.app",
+    messagingSenderId: "495466751324",
+    appId: "1:495466751324:web:324e3440f13fad0acdcd99"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let vendorsList = [];
+
+// ⚡ NON-REPEATING ACCOUNT ID GENERATOR
+function generateUniqueVendorID() {
+    const timestampMillis = Date.now().toString();
+    const shortNum = timestampMillis.slice(-6); 
+    document.getElementById("vendorIdBox").value = "WHL-CID-" + shortNum;
+}
+
+generateUniqueVendorID();
+
+// FETCH & DYNAMICALLY RENDER WHOSALE DATA FROM CLOUD INSTANTLY
+onValue(ref(db, "wholesale_vendors"), (snapshot) => {
+    vendorsList = [];
+    if (snapshot.exists()) {
+        snapshot.forEach(item => {
+            vendorsList.push(item.val());
+        });
+    }
+    renderVendorTable();
+});
+
+function renderVendorTable() {
+    let container = document.getElementById("vendorTableArea");
+
+    if (vendorsList.length === 0) {
+        container.innerHTML = "<p style='color: #aaa;'>No wholesale partners listed in data registry node.</p>";
+        return;
+    }
+
+    let html = `
+        <table>
+            <tr>
+                <th>Customer ID</th>
+                <th>Name</th>
+                <th>Contact</th>
+                <th>Address</th>
+                <th>GSTIN</th>
+                <th>Discount</th>
+            </tr>
+    `;
+
+    vendorsList.forEach(v => {
+        html += `
+            <tr>
+                <td style="color: #ff7200; font-weight: bold;">${v.customerId}</td>
+                <td>${v.name}</td>
+                <td>${v.phone}</td>
+                <td>${v.address}</td>
+                <td>${v.gstin || 'N/A'}</td>
+                <td style="color: #55ff55; font-weight: bold;">${v.discountPercent}%</td>
+            </tr>
+        `;
+    });
+
+    html += `</table>`;
+    container.innerHTML = html;
+}
+
+document.getElementById("vendorForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const currentGeneratedId = document.getElementById("vendorIdBox").value;
+
+    const dataPayload = {
+        customerId: currentGeneratedId,
+        name: document.getElementById("vendorName").value,
+        phone: document.getElementById("vendorContact").value,
+        address: document.getElementById("vendorAddress").value,
+        gstin: document.getElementById("vendorGst").value.trim().toUpperCase() || "N/A",
+        discountPercent: Number(document.getElementById("vendorDiscount").value),
+        createdOn: new Date().toLocaleString()
+    };
+
+    try {
+        await push(ref(db, "wholesale_vendors"), dataPayload);
+        e.target.reset();
+        generateUniqueVendorID();
+        alert("Wholesale Merchant Partner Registered Successfully!");
+    } catch (error) {
+        alert("Submission Rejected: " + error.message);
+    }
+});
+
+document.getElementById("vendorForm").addEventListener("reset", () => {
+    setTimeout(generateUniqueVendorID, 10);
+});
+
+</script>
+
+</body>
+</html>
