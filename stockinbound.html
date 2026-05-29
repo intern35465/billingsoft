@@ -1,88 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Stock Inbound</title>
-
-    <style>
-        body {
-            font-family: Arial;
-            padding: 20px;
-        }
-
-        form {
-            background-color: #f5f5f5;
-            padding: 20px;
-            width: 300px;
-            border-radius: 10px;
-        }
-
-        input[type="text"],
-        input[type="number"] {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-
-        input[type="submit"],
-        input[type="reset"] {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            color: white;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        input[type="submit"] {
-            background-color: green;
-        }
-
-        input[type="reset"] {
-            background-color: red;
-        }
     <link rel="stylesheet" href="stockinbound.css">
-    </style>
 </head>
 
 <body>
 
-    <h1>Stock Inbound</h1>
+    <div class="form-container">
+        <h1>Stock Inbound</h1>
 
-    <form id="stockForm">
+        <form id="stockForm">
 
-        <label>Product Name:</label><br>
-        <input type="text" id="productName" placeholder="Enter product name" required><br><br>
+            <label>Product Name:</label><br>
+            <input type="text" id="productName" placeholder="Enter product name" required>
 
-        <label>Description:</label><br>
-        <input type="text" id="description" placeholder="Enter product description"><br><br>
+            <label>Description:</label><br>
+            <input type="text" id="description" placeholder="Enter product description">
 
-        <label>Product Quantity (grams):</label><br>
-        <input type="number" id="quantityGrams" placeholder="Enter quantity" required><br><br>
+            <label>Product Quantity (grams):</label><br>
+            <input type="number" id="quantityGrams" placeholder="Enter quantity" required>
 
-        <label>No. of Products:</label><br>
-        <input type="number" id="productCount" placeholder="Enter number of products" required><br><br>
+            <label>No. of Products:</label><br>
+            <input type="number" id="productCount" placeholder="Enter number of products" required>
 
-        <label>Price per piece:</label><br>
-        <input type="number" id="price" placeholder="Enter price" required><br><br>
+            <label>Price per piece:</label><br>
+            <input type="number" id="price" placeholder="Enter price" required>
 
-        <label>SKU:</label><br>
-        <input type="text" id="skuBox" readonly placeholder="Auto generated SKU"><br><br>
+            <label>SKU:</label><br>
+            <input type="text" id="skuBox" readonly placeholder="Auto generated SKU">
 
-        <input type="submit" value="Submit">
-        <input type="reset" value="Clear">
+            <div class="button-group">
+                <input type="submit" value="Submit">
+                <input type="reset" value="Clear">
+            </div>
 
-    </form>
+        </form>
+    </div>
 
     <script type="module">
-        // 1. Import Firebase features over the web
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // 2. Your exact Firebase web configuration keys
         const firebaseConfig = {
             apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
             authDomain: "zbillz-f4798.firebaseapp.com",
@@ -94,11 +55,9 @@
             measurementId: "G-8SZG4XLT9P"
         };
 
-        // Initialize Firebase and Realtime Database
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // SKU Generation Setup
         let letter = "A";
         let number = 111;
 
@@ -107,17 +66,14 @@
             if (skuBox) skuBox.value = letter + number;
         }
 
-        // Initialize SKU text box on page load
         generateSKU();
 
-        // Handle Form Submission
         const form = document.getElementById('stockForm');
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
 
             const currentSku = letter + number;
 
-            // Collect user input data
             const stockData = {
                 productName: document.getElementById("productName").value,
                 description: document.getElementById("description").value,
@@ -128,12 +84,9 @@
             };
 
             try {
-                // Send data directly to your Realtime Database under a folder named 'inventory'
                 await push(ref(db, 'inventory'), stockData);
-                
                 alert(`Successfully saved stock for SKU: ${currentSku}`);
 
-                // Progress SKU generator logic
                 number++;
                 if (number > 999) {
                     number = 111;
@@ -141,7 +94,6 @@
                     else if (letter == "B") letter = "C";
                 }
 
-                // Reset the form fields and update the new SKU box visual
                 form.reset();
                 generateSKU();
 
