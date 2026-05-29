@@ -1,46 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Inventory Section</title>
 
-    <style>
+    <!-- CONNECT CSS -->
 
-        body{
-            margin:0;
-            font-family:Arial;
-            background-color:#f4f4f4;
-            padding:40px;
-        }
-
-        .cards{
-            display:flex;
-            justify-content:center;
-            gap:30px;
-            flex-wrap:wrap;
-        }
-
-        .card{
-            width:280px;
-            background-color:white;
-            padding:25px;
-            border-radius:12px;
-            box-sizing:border-box;
-            text-align:center;
-        }
-
-        .card a{
-            display:inline-block;
-            padding:12px 20px;
-            background-color:blue;
-            color:white;
-            text-decoration:none;
-            border-radius:6px;
-            transition:0.3s;
-        }
-
-    </style>
+    <link rel="stylesheet" href="warehouse.css">
 
 </head>
 
@@ -50,25 +21,51 @@
 
     <div class="cards">
 
+        <!-- STOCK INBOUND -->
+
         <div class="card">
 
             <h2>STOCKS INBOUND</h2>
 
             <p>
-                Manage all your stock entries 
+                Manage all your stock entries and warehouse products easily.
             </p>
- <li><a href="stockinbound.html">Stock Inbound</a></li>
+
+            <a href="stockinbound.html">
+                Stock Inbound
+            </a>
+
         </div>
+
+        <!-- PEAK -->
 
         <div class="card">
 
             <h2>PEAK</h2>
 
             <p>
-                Check stock trends and insights at a glance
+                Check stock trends and inventory insights instantly.
             </p>
 
-          <li><a href="peak.html">peak</a></li>
+            <a href="peak.html">
+                Open Peak
+            </a>
+
+        </div>
+
+        <!-- INVENTORY REPORT -->
+
+        <div class="card">
+
+            <h2>REPORTS</h2>
+
+            <p>
+                View warehouse reports and stock movement details.
+            </p>
+
+            <a href="#">
+                View Reports
+            </a>
 
         </div>
 
