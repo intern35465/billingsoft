@@ -6,9 +6,264 @@
     
     <script src="auth-guard.js"></script>
 
-    <link rel="stylesheet" href="stockinbound.css">
-    
-    <link rel="stylesheet" href="setup_inbound.css?v=1">
+    <style>
+        /* INLINE CORE STYLE SHEET OVERRIDES */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background-image: url('https://res.cloudinary.com/ddff5thvj/image/upload/v1779987780/bbyh3a5rllxtnuhn3ljv.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-y: auto;
+            padding: 20px 10px 50px 10px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.78);
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        h1 {
+            color: white;
+            font-size: 32px;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px #ff7200;
+            position: relative;
+            z-index: 2;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        h1 span { color: #ff7200; }
+
+        .admin-warning-subtitle {
+            color: #ff3333;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 25px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* WORKSPACE SYSTEM - FORCE VERTICAL STACK FOR MOBILE */
+        .admin-workspace {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 500px;
+            z-index: 2;
+            position: relative;
+        }
+
+        .control-panel, .registry-panel {
+            width: 100% !important;
+            max-width: 100% !important;
+            flex: none !important;
+        }
+
+        /* SEARCH BOX CONTAINER */
+        .search-box-wrapper {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            width: 100%;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .search-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        /* INPUT OVERRIDES - PREVENTS SQUISHING */
+        #editStockForm input[type="text"],
+        #editStockForm input[type="number"],
+        .search-row input[type="text"] {
+            width: 100% !important;
+            max-width: 100% !important;
+            height: 45px !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 10px !important;
+            padding: 0 15px !important;
+            color: white !important;
+            font-size: 15px !important;
+            margin-bottom: 15px !important;
+            box-sizing: border-box !important;
+            outline: none;
+        }
+
+        .search-row input[type="text"] {
+            margin-bottom: 0 !important;
+        }
+
+        #editStockForm label,
+        .search-box-wrapper label {
+            display: block;
+            color: #ff7200;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        .search-row button {
+            background: #ff7200;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 0 22px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        /* FORM OPACITY ENGINE LOCKOUTS */
+        .disabled-form {
+            opacity: 0.25;
+            pointer-events: none;
+            filter: grayscale(1);
+        }
+
+        #editStockForm {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px 20px;
+            border-radius: 20px;
+            width: 100%;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            margin-top: 20px;
+        }
+
+        .read-only-input {
+            background: rgba(255, 255, 255, 0.02) !important;
+            border: 1px dashed rgba(255, 255, 255, 0.2) !important;
+            color: #ff7200 !important;
+            font-weight: bold;
+        }
+
+        /* SPLIT WORKSPACE CONTROL BUTTONS */
+        .admin-button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .btn-action {
+            flex: 1;
+            height: 48px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .btn-save { background: #ff7200; }
+        .btn-danger { background: #cc2424; }
+
+        /* DATA REGISTRY BLOCK MONITOR */
+        .registry-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px 15px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            color: white;
+            overflow: hidden;
+        }
+
+        .registry-panel h3 {
+            color: #ff7200;
+            margin-bottom: 15px;
+            font-size: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+            text-align: left;
+        }
+
+        .table-scroll-container {
+            width: 100%;
+            overflow-x: auto;
+            max-height: 350px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        th {
+            background: rgba(255, 114, 0, 0.15);
+            color: #ff7200;
+            font-weight: bold;
+        }
+
+        td { color: #e0e0e0; }
+
+        .abort-panel-btn {
+            background: #111;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 13px 40px;
+            font-size: 15px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        /* DESKTOP BALANCING SCREEN RESPONSIVENESS */
+        @media (min-width: 950px) {
+            body { padding-top: 40px; }
+            .admin-workspace {
+                flex-direction: row;
+                max-width: 1200px;
+                align-items: flex-start;
+            }
+            .control-panel { flex: 1; max-width: 450px; }
+            .registry-panel { flex: 1.6; }
+        }
+    </style>
 </head>
 <body>
 
@@ -78,7 +333,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 let completeInventory = {};
-let targetFirebaseKey = null; // Keeps track of the targeted DB item node ID string
+let targetFirebaseKey = null;
 
 // LIVE-STREAM ALL WAREHOUSE INVENTORY NODES
 onValue(ref(db, "inventory"), (snapshot) => {
@@ -89,7 +344,7 @@ onValue(ref(db, "inventory"), (snapshot) => {
     renderLiveInventoryGrid();
 });
 
-// BUILD AND RENDER INVENTORY TABLE
+// BUILD AND RENDER INVENTORY TABLE WITH DATA KEY BALANCERS
 function renderLiveInventoryGrid() {
     const displayContainer = document.getElementById("inventoryLiveGrid");
     const keys = Object.keys(completeInventory);
@@ -114,12 +369,26 @@ function renderLiveInventoryGrid() {
 
     keys.forEach(keyId => {
         const item = completeInventory[keyId];
+        
+        // GLOBAL ATTRIBUTE CHECK MATRIX: Checks all naming patterns
+        const actualSku = item.sku || 
+                          item.productSku || 
+                          item.product_sku || 
+                          item.itemSku || 
+                          item.skuCode || 
+                          item.id || 
+                          'N/A';
+        
+        const actualName = item.productName || item.name || item.itemName || 'N/A';
+        const actualQty = item.quantity !== undefined ? item.quantity : (item.qty || 0);
+        const actualPrice = item.retailPrice || item.price || item.unitPrice || 0;
+
         gridHtml += `
-            <tr onclick="quickSelectSku('${item.productSku || ''}')" style="cursor: pointer;" title="Click to auto-populate editor tool">
-                <td style="color: #ff7200; font-weight: bold;">${item.productSku || 'N/A'}</td>
-                <td>${item.productName || 'N/A'}</td>
-                <td style="font-weight: bold; color: ${Number(item.quantity) > 5 ? '#e0e0e0' : '#ff4444'}">${item.quantity || 0}</td>
-                <td>₹${item.retailPrice || item.price || 0}</td>
+            <tr onclick="quickSelectSku('${actualSku}')" style="cursor: pointer;" title="Click to auto-populate editor tool">
+                <td style="color: #ff7200; font-weight: bold;">${actualSku}</td>
+                <td>${actualName}</td>
+                <td style="font-weight: bold; color: ${Number(actualQty) > 5 ? '#e0e0e0' : '#ff4444'}">${actualQty}</td>
+                <td>₹${actualPrice}</td>
             </tr>
         `;
     });
@@ -128,15 +397,15 @@ function renderLiveInventoryGrid() {
     displayContainer.innerHTML = gridHtml;
 }
 
-// SHORTCUT: CLICKING A ROW AUTO-FILLS SEARCH BOX
+// TAP ACTION ROW SHORTCUT VALUE INJECTOR
 window.quickSelectSku = function(skuCode) {
     document.getElementById("searchSku").value = skuCode;
     fetchProductToEditor();
 };
 
-// SEARCH & POPULATE FIELDS
 document.getElementById("btnFetch").addEventListener("click", fetchProductToEditor);
 
+// SEARCH & POPULATE ENGINE FOR MUTATION FIELDS
 function fetchProductToEditor() {
     const searchTarget = document.getElementById("searchSku").value.trim().toUpperCase();
     if (!searchTarget) { alert("Please provide a SKU code to search."); return; }
@@ -144,23 +413,25 @@ function fetchProductToEditor() {
     targetFirebaseKey = null;
     let matchingData = null;
 
-    // Scan dictionary keys for matching sub-property values
     for (const keyId in completeInventory) {
-        if (completeInventory[keyId].productSku && completeInventory[keyId].productSku.toUpperCase() === searchTarget) {
+        const item = completeInventory[keyId];
+        const activeSku = (item.sku || item.productSku || item.product_sku || item.itemSku || item.skuCode || item.id || "").toUpperCase();
+        
+        if (activeSku && activeSku === searchTarget) {
             targetFirebaseKey = keyId;
-            matchingData = completeInventory[keyId];
+            matchingData = item;
             break;
         }
     }
 
     if (targetFirebaseKey && matchingData) {
-        // Hydrate target interface inputs
-        document.getElementById("displaySku").value = matchingData.productSku;
-        document.getElementById("stockName").value = matchingData.productName || "";
-        document.getElementById("stockQty").value = matchingData.quantity || 0;
-        document.getElementById("stockPrice").value = matchingData.retailPrice || matchingData.price || 0;
+        const structuralSku = matchingData.sku || matchingData.productSku || matchingData.product_sku || matchingData.itemSku || matchingData.skuCode || matchingData.id;
+        
+        document.getElementById("displaySku").value = structuralSku;
+        document.getElementById("stockName").value = matchingData.productName || matchingData.name || matchingData.itemName || "";
+        document.getElementById("stockQty").value = matchingData.quantity !== undefined ? matchingData.quantity : (matchingData.qty || 0);
+        document.getElementById("stockPrice").value = matchingData.retailPrice || matchingData.price || matchingData.unitPrice || 0;
 
-        // Unveil control system fields smoothly
         document.getElementById("editStockForm").classList.remove("disabled-form");
     } else {
         alert("SKU code tracking query returned 0 results in warehouse database node.");
@@ -168,7 +439,6 @@ function fetchProductToEditor() {
     }
 }
 
-// RESET EDITOR UTILITIES
 function clearEditorState() {
     targetFirebaseKey = null;
     document.getElementById("editStockForm").reset();
@@ -176,16 +446,25 @@ function clearEditorState() {
     document.getElementById("editStockForm").classList.add("disabled-form");
 }
 
-// FIREBASE ADMIN COMMAND A: UPDATE MUTABLE ATTRIBUTES
+// FIREBASE CONTROLLER ACTION A: UPDATE RECORDS
 document.getElementById("editStockForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!targetFirebaseKey) return;
 
-    const modifiedPayload = {
-        productName: document.getElementById("stockName").value.trim(),
-        quantity: Number(document.getElementById("stockQty").value),
-        retailPrice: Number(document.getElementById("stockPrice").value)
-    };
+    // Detect structure before pushing update package map back up
+    const originalItem = completeInventory[targetFirebaseKey];
+    const modifiedPayload = {};
+
+    if (originalItem.productName !== undefined) modifiedPayload.productName = document.getElementById("stockName").value.trim();
+    if (originalItem.name !== undefined) modifiedPayload.name = document.getElementById("stockName").value.trim();
+    if (originalItem.itemName !== undefined) modifiedPayload.itemName = document.getElementById("stockName").value.trim();
+
+    if (originalItem.quantity !== undefined) modifiedPayload.quantity = Number(document.getElementById("stockQty").value);
+    if (originalItem.qty !== undefined) modifiedPayload.qty = Number(document.getElementById("stockQty").value);
+
+    if (originalItem.retailPrice !== undefined) modifiedPayload.retailPrice = Number(document.getElementById("stockPrice").value);
+    if (originalItem.price !== undefined) modifiedPayload.price = Number(document.getElementById("stockPrice").value);
+    if (originalItem.unitPrice !== undefined) modifiedPayload.unitPrice = Number(document.getElementById("stockPrice").value);
 
     try {
         await update(ref(db, `inventory/${targetFirebaseKey}`), modifiedPayload);
@@ -196,7 +475,7 @@ document.getElementById("editStockForm").addEventListener("submit", async (e) =>
     }
 });
 
-// FIREBASE ADMIN COMMAND B: ERASE TRACKED VARIABLE NODE
+// FIREBASE CONTROLLER ACTION B: REMOVE ENTRIES COMPLETELY
 document.getElementById("btnDelete").addEventListener("click", async () => {
     if (!targetFirebaseKey) return;
     
@@ -209,7 +488,7 @@ document.getElementById("btnDelete").addEventListener("click", async () => {
         clearEditorState();
         document.getElementById("searchSku").value = "";
     } catch (err) {
-        alert("Erase command intercepted or failed: " + err.message);
+        alert("Erase command failed: " + err.message);
     }
 });
 
