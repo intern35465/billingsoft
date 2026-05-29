@@ -1,1 +1,122 @@
-gsnfj
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Stock Inbound</title>
+
+    <style>
+
+        body{
+            font-family:Arial;
+            padding:20px;
+        }
+
+        form{
+            background-color:#f5f5f5;
+            padding:20px;
+            width:300px;
+            border-radius:10px;
+        }
+
+        input[type="text"],
+        input[type="number"]{
+            width:100%;
+            padding:10px;
+            margin-top:5px;
+            border:1px solid #ccc;
+            border-radius:6px;
+            box-sizing:border-box;
+        }
+
+        input[type="submit"],
+        input[type="reset"]{
+            padding:10px 20px;
+            border:none;
+            border-radius:6px;
+            color:white;
+            cursor:pointer;
+            margin-top:10px;
+        }
+
+        input[type="submit"]{
+            background-color:green;
+        }
+
+        input[type="reset"]{
+            background-color:red;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Stock Inbound</h1>
+
+    <form onsubmit="handleSubmit(event)">
+
+        <label>Product Name:</label><br>
+        <input type="text" placeholder="Enter product name"><br><br>
+
+<label>Description:</label><br>
+<input type="text" placeholder="Enter product description"><br><br>
+
+        <label>Product Quantity (grams):</label><br>
+        <input type="number" placeholder="Enter quantity"><br><br>
+
+        <label>No. of Products:</label><br>
+        <input type="number" placeholder="Enter number of products"><br><br>
+
+        <label>Price per piece:</label><br>
+        <input type="number" placeholder="Enter price"><br><br>
+
+        <label>SKU:</label><br>
+        <input type="text" id="skuBox" readonly placeholder="Auto generated SKU"><br><br>
+
+        <input type="submit" value="Submit">
+
+        <input type="reset" value="Clear">
+
+    </form>
+
+<script>
+
+let letter = "A";
+let number = 111;
+
+function generateSKU() {
+    document.getElementById("skuBox").value = letter + number;
+}
+
+window.onload = function() {
+    generateSKU();
+}
+
+function handleSubmit(event) {
+    event.preventDefault();
+
+    alert("SKU: " + letter + number);
+
+    number++;
+
+    if(number > 999){
+        number = 111;
+
+        if(letter == "A"){
+            letter = "B";
+        }
+        else if(letter == "B"){
+            letter = "C";
+        }
+    }
+
+    event.target.reset();
+    generateSKU();
+}
+
+</script>
+
+</body>
+
+</html>
