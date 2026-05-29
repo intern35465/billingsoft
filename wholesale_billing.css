@@ -1,0 +1,93 @@
+/* wholesale_billing.css */
+
+body {
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow-y: auto;
+    padding-top: 40px;
+}
+
+/* WORKSPACE GRID SYSTEM */
+.main-workspace {
+    display: flex;
+    gap: 30px;
+    width: 100%;
+    max-width: 1200px;
+    z-index: 2;
+    position: relative;
+    margin-top: 20px;
+}
+
+.form-panel {
+    flex: 1;
+    max-width: 450px;
+}
+
+/* PREMIUM TABLE GLASSMORPHISM PANEL */
+.table-panel {
+    flex: 1.5;
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    color: white;
+    height: fit-content;
+}
+
+.table-panel h3 {
+    color: #ff7200;
+    margin-bottom: 20px;
+    font-size: 22px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+.table-scroll {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* REGISTRY TABULAR LAYOUT CONFIGURATION */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 14px;
+}
+
+th {
+    background: rgba(255, 114, 0, 0.15);
+    color: #ff7200;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+td {
+    color: #e0e0e0;
+}
+
+tr:hover td {
+    background: rgba(255, 255, 255, 0.03);
+    color: white;
+}
+
+/* RESPONSIVE MOBILE HANDOFF MAP */
+@media (max-width: 900px) {
+    .main-workspace {
+        flex-direction: column;
+        align-items: center;
+    }
+    .form-panel, .table-panel {
+        width: 100%;
+        max-width: 100%;
+    }
+}
