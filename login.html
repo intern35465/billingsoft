@@ -44,9 +44,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // 1. MASTER ADMIN (Built directly into the code)
+        // 💡 MASTER BACKDOOR CREDENTIALS
         const MASTER_USER = "admin";
-        const MASTER_PASS = "ZbilzPassword123"; // You can change this text password here
+        const MASTER_PASS = "ZbilzPassword123";
 
         const credentialForm = document.getElementById('credentialLoginForm');
         
@@ -56,23 +56,22 @@
             const typedUser = document.getElementById('loginUsername').value.trim();
             const typedPass = document.getElementById('loginPassword').value;
 
-            // First: Check if they are logging into the hardcoded Master Admin
-            if (typedUser === MASTER_USER && typedPass === MASTER_PASS) {
+            // 1. First Check: Built-in Master Admin account
+            if (typedUser.toLowerCase() === MASTER_USER && typedPass === MASTER_PASS) {
                 localStorage.setItem("isLoggedIn", "true");
                 localStorage.setItem("userRole", "admin");
                 window.location.href = "index.html";
                 return;
             }
 
-            // Second: If it's not the master admin, look up registered users from the Firebase database
-            const userRef = ref(db, `registered_users/${typedUser}`);
+            // 2. Second Check: Look up your custom registered database users (e.g. Vijay)
+            const userRef = ref(db, `registered_users/${typedUser.toLowerCase()}`);
             
             try {
                 const snapshot = await get(userRef);
                 if (snapshot.exists()) {
                     const accountData = snapshot.val();
                     
-                    // Validate if database password matches what they typed
                     if (accountData.password === typedPass) {
                         localStorage.setItem("isLoggedIn", "true");
                         localStorage.setItem("userRole", accountData.role || "user");
@@ -81,11 +80,11 @@
                         alert("Incorrect password. Please try again.");
                     }
                 } else {
-                    alert("Account username not registered in system.");
+                    alert("Account username not registered in system. Use default 'admin' credentials first.");
                 }
             } catch (error) {
-                console.error("Database connection failure: ", error);
-                alert("Error connecting to login system.");
+                console.error("Firebase connection error: ", error);
+                alert("Error connecting to database logic.");
             }
         });
     </script>
