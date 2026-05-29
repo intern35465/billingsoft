@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zbilz - Admin Controls</title>
+    <link rel="stylesheet" href="stockinbound.css">
+    <script src="auth-guard.js"></script>
+</head>
+<body>
+
+    <div class="form-container" style="position: relative; z-index: 2; width: 420px; margin: auto;">
+        <h1 style="color:white; text-align:center; margin-bottom:30px; font-size:40px; text-shadow: 0 0 10px #ff7200, 0 0 20px #ff7200;">Register User</h1>
+
+        <form id="registerForm">
+            <label>New Username:</label><br>
+            <input type="text" id="regUsername" placeholder="e.g. vijay" required><br><br>
+
+            <label>Account Password:</label><br>
+            <input type="text" id="regPassword" placeholder="Enter secure account password" required><br><br>
+
+            <label>Access Privilege Role:</label><br>
+            <select id="regRole" style="width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size:15px; background: #333; color: white;">
+                <option value="admin">Admin (Full Write Access)</option>
+                <option value="user">User (Read-Only Status)</option>
+            </select>
+
+            <div class="button-group">
+                <input type="submit" value="Register Profile" style="background-color: #ff7200;">
+                <input type="button" value="Back to Home" onclick="window.location.href='index.html'" style="background-color: #444;">
+            </div>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
+            authDomain: "zbillz-f4798.firebaseapp.com",
+            databaseURL: "https://zbillz-f4798-default-rtdb.firebaseio.com",
+            projectId: "zbillz-f4798",
+            storageBucket: "zbillz-f4798.firebasestorage.app",
+            messagingSenderId: "495466751324",
+            appId: "1:495466751324:web:324e3440f13fad0acdcd99",
+            measurementId: "G-8SZG4XLT9P"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const usernameInput = document.getElementById('regUsername').value.trim().toLowerCase();
+            const passwordInput = document.getElementById('regPassword').value;
+            const roleInput = document.getElementById('regRole').value;
+
+            try {
+                // Creates account entry safely under registered_users directory node node
+                await set(ref(db, `registered_users/${usernameInput}`), {
+                    password: passwordInput,
+                    role: roleInput
+                });
+
+                alert(`Account status updated! '${usernameInput}' successfully created as an ${roleInput}.`);
+                document.getElementById('registerForm').reset();
+            } catch (error) {
+                alert("Write request rejected by database security rules configurations: " + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
