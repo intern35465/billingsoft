@@ -1,255 +1,311 @@
-/* ==========================================================================
-   1. SCREEN WORKSPACE STYLING (Looks clean and organized on your screen)
-   ========================================================================== */
-body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background-color: #f4f6f9;
-    color: #212529;
-    margin: 0;
-    padding: 30px 15px;
-    line-height: 1.5;
+/* =====================================================
+   ZBILZ BILLING SYSTEM THEME
+   ===================================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
 }
 
-/* Form Container Card */
-#billingForm {
-    max-width: 1000px;
-    margin: 0 auto;
-    background: #ffffff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+/* BODY */
+
+body{
+    background-image:url('https://res.cloudinary.com/ddff5thvj/image/upload/v1779987780/bbyh3a5rllxtnuhn3ljv.jpg');
+    background-size:cover;
+    background-position:center;
+    background-attachment:fixed;
+    color:white;
+    padding:30px;
+    position:relative;
 }
 
-/* Shop Header Typography */
-center h2 {
-    margin: 0 0 5px 0;
-    font-size: 26px;
-    letter-spacing: 1px;
-    color: #111;
+body::before{
+    content:'';
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.75);
+    z-index:-1;
 }
 
-center p {
-    margin: 4px 0;
-    color: #495057;
-    font-size: 14px;
+/* BILLING FORM */
+
+#billingForm{
+    max-width:1100px;
+    margin:auto;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(12px);
+    border-radius:20px;
+    padding:30px;
+    border:1px solid rgba(255,255,255,0.1);
 }
 
-hr {
-    border: 0;
-    border-top: 1px solid #dee2e6;
-    margin: 20px 0;
+/* HEADER */
+
+center h2{
+    color:#ff7200;
+    font-size:40px;
+    margin-bottom:10px;
+    text-shadow:0 0 15px #ff7200;
 }
 
-/* Side-by-Side Metadata Section Headers */
-h3 {
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #495057;
-    margin-top: 0;
-    margin-bottom: 15px;
-    border-left: 3px solid #0d6efd;
-    padding-left: 8px;
+center p{
+    color:#ddd;
+    margin:5px 0;
 }
 
-/* Inputs and Select Dropdowns */
-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #495057;
-    display: inline-block;
-    width: 130px; /* Aligns input boxes neatly */
-    margin-bottom: 8px;
+hr{
+    border:none;
+    height:1px;
+    background:rgba(255,255,255,0.1);
+    margin:20px 0;
 }
+
+/* SECTION TITLES */
+
+h3{
+    color:#ff7200;
+    margin-bottom:15px;
+    border-left:4px solid #ff7200;
+    padding-left:10px;
+}
+
+/* LABELS */
+
+label{
+    color:#ddd;
+    font-size:14px;
+    font-weight:bold;
+    display:inline-block;
+    width:140px;
+    margin-bottom:8px;
+}
+
+/* INPUTS */
 
 input[type="text"],
 input[type="number"],
 input[type="date"],
 input[type="time"],
-select {
-    padding: 8px 12px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    font-size: 14px;
-    color: #212529;
-    background-color: #fff;
-    width: 200px;
-    box-sizing: border-box;
-    transition: border-color 0.2s ease;
-    margin-bottom: 8px;
+select{
+    width:220px;
+    padding:10px;
+    margin-bottom:10px;
+    border:none;
+    border-bottom:2px solid #ff7200;
+    background:rgba(255,255,255,0.05);
+    color:white;
+    border-radius:6px;
+    outline:none;
 }
 
-input:focus, select:focus {
-    border-color: #86b7fe;
-    outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+input:focus,
+select:focus{
+    box-shadow:0 0 15px rgba(255,114,0,0.5);
 }
 
-input[readonly] {
-    background-color: #e9ecef;
-    color: #495057;
-    cursor: not-allowed;
+input[readonly]{
+    color:#ff7200;
+    font-weight:bold;
 }
 
-/* Dynamic Items Grid Table */
-#invoiceItemsTable {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 25px 0 15px 0;
-    background-color: #fff;
+input::placeholder{
+    color:#bbb;
 }
 
-#invoiceItemsTable th {
-    background-color: #212529;
-    color: #ffffff;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 0.5px;
-    padding: 12px 10px;
+option{
+    color:black;
 }
 
-#invoiceItemsTable td {
-    padding: 6px;
-    border: 1px solid #dee2e6;
+/* VENDOR BOX */
+
+#vendorDropdownArea{
+    background:rgba(255,255,255,0.05);
+    padding:15px;
+    border-left:4px solid #ff7200;
+    border-radius:12px;
+    margin-bottom:20px;
 }
 
-/* Expand input fields inside the table cells cleanly */
-#invoiceItemsTable td input {
-    width: 100%;
-    margin: 0;
-    padding: 6px;
-    border: 1px solid transparent;
-    background: transparent;
+/* TABLE */
+
+#invoiceItemsTable{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+    background:rgba(255,255,255,0.05);
+    overflow:hidden;
 }
 
-#invoiceItemsTable td input:focus {
-    background: #fff;
-    border-color: #86b7fe;
+#invoiceItemsTable th{
+    background:rgba(255,114,0,0.2);
+    color:#ff7200;
+    padding:14px;
+    text-align:center;
 }
 
-/* Action Utility Buttons */
-button {
-    font-weight: 600;
-    border-radius: 4px;
-    padding: 8px 16px;
-    font-size: 14px;
-    cursor: pointer;
-    border: none;
-    transition: background-color 0.2s ease;
+#invoiceItemsTable td{
+    border:1px solid rgba(255,255,255,0.08);
+    padding:8px;
 }
 
-#addItemRowBtn {
-    background-color: #198754;
-    color: #fff;
+#invoiceItemsTable td input{
+    width:100%;
+    background:transparent;
+    border:none;
+    color:white;
+    padding:8px;
 }
 
-#addItemRowBtn:hover {
-    background-color: #157347;
+#invoiceItemsTable td input:focus{
+    background:rgba(255,255,255,0.05);
 }
 
-/* Dynamic Delete Row Button */
-#invoiceTableBody button {
-    background-color: #dc3545;
-    color: #fff;
-    padding: 4px 10px;
-    font-size: 12px;
+/* BUTTONS */
+
+button{
+    padding:12px 22px;
+    border:none;
+    border-radius:10px;
+    background:#ff7200;
+    color:white;
+    cursor:pointer;
+    font-weight:bold;
+    transition:0.3s;
 }
 
-#invoiceTableBody button:hover {
-    background-color: #bb2d3b;
+button:hover{
+    transform:translateY(-2px);
+
+    box-shadow:
+    0 0 10px #ff7200,
+    0 0 20px #ff7200,
+    0 0 35px #ff7200;
 }
 
-#printInvoiceBtn {
-    background-color: #0d6efd;
-    color: #fff;
-    padding: 12px 32px;
-    font-size: 16px;
-    box-shadow: 0 4px 6px rgba(13, 110, 253, 0.15);
+/* ADD ITEM BUTTON */
+
+#addItemRowBtn{
+    background:#ff7200;
 }
 
-#printInvoiceBtn:hover {
-    background-color: #0b5ed7;
+/* DELETE BUTTON */
+
+#invoiceTableBody button{
+    background:#ff4d4d;
+    padding:8px 12px;
 }
 
-/* Wholesale Section Adjustments */
-#vendorDropdownArea {
-    background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 6px;
-    border-left: 4px solid #0d6efd;
-    margin-bottom: 20px;
+#invoiceTableBody button:hover{
+    box-shadow:
+    0 0 10px #ff4d4d,
+    0 0 20px #ff4d4d;
 }
 
+/* PRINT BUTTON */
 
-/* ==========================================================================
-   2. ADVANCED PRINT OPTIMIZATION (Creates the beautiful, flat bill layout)
-   ========================================================================== */
-@media print {
-    body {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        font-size: 12px;
+#printInvoiceBtn{
+    width:220px;
+    height:50px;
+    font-size:16px;
+}
+
+/* TOTAL BOXES */
+
+#priceBox,
+#totalAmount{
+    color:#ff7200;
+    font-weight:bold;
+    font-size:18px;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+    body{
+        padding:15px;
     }
 
-    #billingForm {
-        box-shadow: none !important;
-        padding: 0 !important;
-        max-width: 100% !important;
+    #billingForm{
+        padding:20px;
     }
 
-    /* Instantly hide control handles, add/remove buttons, and print triggers on paper */
-    button, 
-    #addItemRowBtn, 
-    #printInvoiceBtn, 
-    .no-print, 
-    th:last-child, 
-    td:last-child { 
-        display: none !important; 
+    label{
+        width:100%;
     }
 
-    /* Convert entry elements to seamless flat texts without boundaries */
-    input, select {
-        border: none !important;
-        background: transparent !important;
-        outline: none !important;
-        box-shadow: none !important;
-        appearance: none !important;
-        -webkit-appearance: none !important;
-        -moz-appearance: none !important;
-        color: #000000 !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        width: auto !important;
-        pointer-events: none !important;
-    }
-    
-    /* Retain aligned blocks for tabular layout alignment on data blocks */
-    label {
-        color: #000000 !important;
+    input,
+    select{
+        width:100%;
     }
 
-    /* High-contrast crisp border rules for invoice lines print rendering */
-    #invoiceItemsTable {
-        border: 1px solid #000000 !important;
-        margin-top: 15px;
+    center h2{
+        font-size:30px;
     }
 
-    #invoiceItemsTable th {
-        background-color: #f1f3f5 !important;
-        color: #000000 !important;
-        border-bottom: 2px solid #000000 !important;
-        padding: 6px !important;
+    table{
+        font-size:12px;
+    }
+}
+
+/* =====================================================
+   PRINT SETTINGS
+   ===================================================== */
+
+@media print{
+
+    body{
+        background:white !important;
+        color:black !important;
+        padding:0 !important;
     }
 
-    #invoiceItemsTable td {
-        border: 1px solid #000000 !important;
-        padding: 6px !important;
+    body::before{
+        display:none !important;
     }
-    
-    #invoiceItemsTable td input {
-        padding: 0 !important;
+
+    #billingForm{
+        background:white !important;
+        border:none !important;
+        box-shadow:none !important;
+        padding:0 !important;
+    }
+
+    button,
+    #addItemRowBtn,
+    #printInvoiceBtn,
+    .no-print,
+    th:last-child,
+    td:last-child{
+        display:none !important;
+    }
+
+    input,
+    select{
+        border:none !important;
+        background:transparent !important;
+        box-shadow:none !important;
+        color:black !important;
+        width:auto !important;
+    }
+
+    #invoiceItemsTable{
+        background:white !important;
+    }
+
+    #invoiceItemsTable th{
+        background:#f1f1f1 !important;
+        color:black !important;
+        border:1px solid black !important;
+    }
+
+    #invoiceItemsTable td{
+        border:1px solid black !important;
+        color:black !important;
     }
 }
