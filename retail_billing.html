@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retail Billing Invoice</title>
+    <title>Retail Billing Invoice Engine</title>
     <style>
-        /* Modern Premium Dark/Neon Theme Engine */
+        /* Modern Premium Glassmorphic Dark Theme Configuration */
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background: radial-gradient(circle at top left, #2c3e50, #1a252f);
@@ -27,24 +27,51 @@
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
         }
 
-        h2 {
-            margin-top: 0;
-            margin-bottom: 30px;
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            color: #ffffff;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        .store-header-box {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding-bottom: 15px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        /* Responsive Form Layout Grid */
+        .store-header-box h1 {
+            margin: 0 0 5px 0;
+            font-size: 28px;
+            letter-spacing: 1px;
+        }
+
+        .store-header-box p {
+            margin: 3px 0;
+            font-size: 13px;
+            color: #cbd5e1;
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #38bdf8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .invoice-header-fields {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
-            margin-bottom: 35px;
+            margin-bottom: 25px;
+        }
+
+        .vendor-profile-panel {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
         }
 
         .form-group {
@@ -54,14 +81,13 @@
         }
 
         .form-group label {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.8px;
             color: #cbd5e1;
         }
 
-        /* Universal Custom Input Stylings */
         input[type="text"], 
         input[type="number"], 
         select {
@@ -92,11 +118,10 @@
             cursor: not-allowed;
         }
 
-        /* Tabular Item Matrix Layout */
         .items-table-wrapper {
             width: 100%;
             overflow-x: auto;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
             border-radius: 8px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -105,7 +130,7 @@
             width: 100%;
             border-collapse: collapse;
             background: rgba(15, 23, 42, 0.3);
-            min-width: 700px;
+            min-width: 750px;
         }
 
         .items-table th {
@@ -114,7 +139,6 @@
             font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
             padding: 14px 16px;
             text-align: left;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -123,38 +147,89 @@
         .items-table td {
             padding: 10px 14px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
         }
 
-        .items-table tbody tr:hover {
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        /* Grand Summary Panel alignment */
-        .total-summary-section {
+        /* Red Delete Action Cross Styling */
+        .btn-delete-row {
+            background: #ef4444;
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
             display: flex;
-            justify-content: flex-end;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .btn-delete-row:hover {
+            background: #dc2626;
+        }
+
+        .btn-add-row {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 25px;
+            transition: background 0.2s;
+        }
+
+        .btn-add-row:hover {
+            background: #16a34a;
+        }
+
+        .summary-calculation-block {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 15px;
+            margin-top: 20px;
+            padding-right: 10px;
+        }
+
+        .summary-row {
+            display: flex;
             align-items: center;
             gap: 15px;
-            margin-top: 25px;
-            padding: 15px 5px;
+            width: 100%;
+            max-width: 380px;
+            justify-content: space-between;
         }
 
-        .total-summary-section label {
-            font-size: 16px;
-            font-weight: 700;
-            color: #38bdf8;
+        .summary-row label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #cbd5e1;
         }
 
-        .total-summary-section input {
-            max-width: 200px;
-            font-size: 18px;
-            font-weight: 700;
-            color: #22c55e;
+        .summary-row input, .summary-row select {
+            max-width: 180px;
             text-align: right;
-            border-color: rgba(34, 197, 94, 0.3);
         }
 
-        /* Database Status Alert Message Block */
+        .grand-total-label {
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            color: #38bdf8 !important;
+        }
+
+        .grand-total-input {
+            font-size: 18px !important;
+            font-weight: 700 !important;
+            color: #22c55e !important;
+            border-color: rgba(34, 197, 94, 0.4) !important;
+        }
+
         #dbStatusMessage {
             display: none;
             text-align: center;
@@ -164,16 +239,8 @@
             max-width: 550px;
             padding: 12px;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            animation: fadeIn 0.3s ease-in-out;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Dynamic action button structures */
         .action-buttons-container {
             display: flex;
             gap: 15px;
@@ -183,7 +250,7 @@
             max-width: 550px;
         }
 
-        button {
+        .btn-action {
             flex: 1;
             padding: 14px 24px;
             font-size: 15px;
@@ -191,173 +258,169 @@
             border-radius: 8px;
             border: none;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            letter-spacing: 0.5px;
+            transition: all 0.25s ease;
         }
 
         #submitBillBtn {
             background: linear-gradient(135deg, #0ea5e9, #0284c7);
-            color: #ffffff;
-            box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3);
+            color: white;
         }
 
         #submitBillBtn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
             filter: brightness(1.1);
+            transform: translateY(-1px);
         }
 
         #printBillBtn {
             background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: #ffffff;
-            box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3);
+            color: white;
         }
 
         #printBillBtn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
             filter: brightness(1.1);
+            transform: translateY(-1px);
         }
 
-        button:active:not(:disabled) {
-            transform: translateY(1px) !important;
-        }
-
-        /* Locked/Disabled System state styling */
         button:disabled {
             background: #475569 !important;
             color: #94a3b8 !important;
             cursor: not-allowed;
             opacity: 0.4;
             transform: none !important;
-            box-shadow: none !important;
         }
 
-        /* Complete page-break configuration rules for printing actions */
         @media print {
-            body {
-                background: #ffffff !important;
-                color: #000000 !important;
-                padding: 0;
-            }
-            .billing-container {
-                background: transparent !important;
-                border: none !important;
-                box-shadow: none !important;
-                padding: 0;
-                backdrop-filter: none !important;
-            }
-            h2 {
-                color: #000000 !important;
-                border-bottom: 2px solid #000000 !important;
-            }
-            .form-group label { color: #444444 !important; }
-            input[type="text"], input[type="number"], select {
-                background: transparent !important;
-                border: 1px solid #777777 !important;
-                color: #000000 !important;
-            }
-            .items-table th {
-                background: #eeeeee !important;
-                color: #000000 !important;
-                border-bottom: 2px solid #000000 !important;
-            }
-            .items-table td { border-bottom: 1px solid #dddddd !important; }
-            .total-summary-section input { color: #000000 !important; border-color: #000 !important; }
-            .action-buttons-container, #dbStatusMessage {
-                display: none !important;
-            }
+            body { background: white; color: black; padding: 0; }
+            .billing-container { background: transparent; border: none; box-shadow: none; padding: 0; backdrop-filter: none; }
+            .action-buttons-container, .btn-add-row, .btn-delete-row, #dbStatusMessage, th:last-child, td:last-child { display: none !important; }
+            input, select { border: 1px solid #000 !important; color: #000 !important; background: transparent !important; }
         }
     </style>
 </head>
 <body>
 
     <div class="billing-container">
-        <h2>Retail Billing Invoice</h2>
+        <div class="store-header-box">
+            <h1>STORE NAME</h1>
+            <p>Location: PALAKKAD | Ph No: 9876543210</p>
+            <p>GSTIN: 27ABCDE1234F1Z5</p>
+        </div>
 
+        <h2>Invoice System Profile</h2>
         <div class="invoice-header-fields">
             <div class="form-group">
-                <label>Invoice ID (System)</label>
-                <input type="text" id="invoiceIdInput" value="INV-157190" placeholder="Auto-generated ID">
+                <label>Bill No:</label>
+                <input type="text" id="billNoInput" readonly>
             </div>
-
             <div class="form-group">
-                <label>Bill Number</label>
-                <input type="text" id="billNoInput" placeholder="Enter Bill No">
+                <label>Invoice ID (System Reference):</label>
+                <input type="text" id="invoiceIdInput" readonly style="color: #38bdf8; font-weight: bold;">
             </div>
-
             <div class="form-group">
-                <label>Customer Name</label>
-                <input type="text" id="customerNameInput" placeholder="Walk-In Customer">
+                <label>Date:</label>
+                <input type="text" id="dateInput">
             </div>
-
             <div class="form-group">
-                <label>Customer Phone No</label>
-                <input type="text" id="customerPhoneInput" placeholder="N/A">
-            </div>
-
-            <div class="form-group">
-                <label>Payment Method</label>
-                <select id="paymentMethodSelect">
-                    <option value="Cash">Cash</option>
-                    <option value="UPI">UPI / Digital Terminal</option>
-                    <option value="Card">Credit/Debit Card</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Billing Date</label>
-                <input type="text" id="dateInput" value="30/05/2026">
-            </div>
-
-            <div class="form-group">
-                <label>Billing Time</label>
-                <input type="text" id="timeInput" value="14:30">
+                <label>Time:</label>
+                <input type="text" id="timeInput">
             </div>
         </div>
 
+        <h2>Customer & Vendor Parameters</h2>
+        <div class="vendor-profile-panel">
+            <div class="form-group">
+                <label>Customer Classification</label>
+                <select id="customerClassificationSelect">
+                    <option value="Wholesale Vendor">Wholesale Vendor</option>
+                    <option value="Retail Consumer">Retail Consumer</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Select Saved Vendor Profile</label>
+                <select id="vendorProfileSelect">
+                    <option value="">-- Select Vendor Profile --</option>
+                    <option value="Sye" data-phone="3464655633" data-discount="5">Sye Trading Co.</option>
+                    <option value="Albin" data-phone="9446123456" data-discount="10">Albin Distributors</option>
+                    <option value="WalkIn" data-phone="N/A" data-discount="0">Walk-In General Customer</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Contract Discount (%)</label>
+                <input type="text" id="contractDiscountInput" value="0%" readonly>
+            </div>
+            <div class="form-group">
+                <label>Customer Name:</label>
+                <input type="text" id="customerNameInput" placeholder="Enter customer name">
+            </div>
+            <div class="form-group">
+                <label>Customer Phone No:</label>
+                <input type="text" id="customerPhoneInput" placeholder="Enter contact number">
+            </div>
+        </div>
+
+        <h2>Order Ledger Entries</h2>
         <div class="items-table-wrapper">
             <table class="items-table">
                 <thead>
                     <tr>
-                        <th>SKU / Code</th>
-                        <th>Product Description</th>
-                        <th style="width: 100px;">Quantity</th>
-                        <th style="width: 130px;">Rate (₹)</th>
-                        <th style="width: 150px;">Amount (₹)</th>
+                        <th style="width: 15%;">SKU</th>
+                        <th style="width: 40%;">Product Name</th>
+                        <th style="width: 12%;">Quantity</th>
+                        <th style="width: 15%;">Rate</th>
+                        <th style="width: 13%;">Amount</th>
+                        <th style="width: 5%;">Action</th>
                     </tr>
                 </thead>
                 <tbody id="itemsTableBody">
                     <tr>
-                        <td><input type="text" placeholder="SKU001"></td>
-                        <td><input type="text" placeholder="Product Name"></td>
-                        <td><input type="number" class="qty-input" value="1" min="1"></td>
-                        <td><input type="number" class="rate-input" value="0.00" step="0.01"></td>
-                        <td><input type="number" class="amount-input" value="0.00" readonly></td>
-                    </tr>
-                    <tr>
-                        <td><input type="text" placeholder="SKU002"></td>
-                        <td><input type="text" placeholder="Product Name"></td>
-                        <td><input type="number" class="qty-input" value="1" min="1"></td>
-                        <td><input type="number" class="rate-input" value="0.00" step="0.01"></td>
-                        <td><input type="number" class="amount-input" value="0.00" readonly></td>
+                        <td><input type="text" class="sku-field" placeholder="A111"></td>
+                        <td><input type="text" class="name-field" placeholder="Product Description"></td>
+                        <td><input type="number" class="qty-field" value="1" min="1"></td>
+                        <td><input type="number" class="rate-field" value="0.00" step="0.01"></td>
+                        <td><input type="number" class="amount-field" value="0.00" readonly></td>
+                        <td><button type="button" class="btn-delete-row">X</button></td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <div class="total-summary-section">
-            <label>Grand Total Amount:</label>
-            <input type="number" id="totalAmountInput" value="0.00" step="0.01">
+        <button type="button" class="btn-add-row" id="addItemLineBtn">+ Add Item Line</button>
+
+        <div class="summary-calculation-block">
+            <div class="summary-row">
+                <label>Gross Price (Subtotal):</label>
+                <input type="number" id="subtotalAmountInput" value="0.00" readonly>
+            </div>
+            <div class="summary-row">
+                <label>Tax Structure Selector:</label>
+                <select id="taxBracketSelect">
+                    <option value="0">GST 0%</option>
+                    <option value="5">GST 5%</option>
+                    <option value="12">GST 12%</option>
+                    <option value="18" selected>GST 18%</option>
+                    <option value="28">GST 28%</option>
+                </select>
+            </div>
+            <div class="summary-row">
+                <label class="grand-total-label">Total Invoice Amount:</label>
+                <input type="number" id="totalAmountInput" class="grand-total-input" value="0.00" readonly>
+            </div>
+            <div class="summary-row">
+                <label>Payment Settlement:</label>
+                <select id="paymentMethodSelect">
+                    <option value="Cash">Cash Settlement</option>
+                    <option value="UPI">UPI Terminal / QR Code</option>
+                    <option value="Card">Card Swipe POS</option>
+                </select>
+            </div>
         </div>
 
         <div id="dbStatusMessage"></div>
 
         <div class="action-buttons-container">
-            <button type="button" id="submitBillBtn">Submit Bill</button>
-            <button type="button" id="printBillBtn" disabled>Print Bill</button>
+            <button type="button" id="submitBillBtn" class="btn-action">Submit Bill</button>
+            <button type="button" id="printBillBtn" class="btn-action" disabled>Print Bill</button>
         </div>
-
     </div>
 
     <script type="module">
@@ -377,34 +440,129 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        function getBillingItems() {
+        // ==========================================
+        // AUTO GENERATE CODES & DATETIME STAMPS
+        // ==========================================
+        function initInvoiceMetaFields() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            
+            // Format: BILL-YYYYMMDD-XXXX
+            const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+            document.getElementById("billNoInput").value = `BILL-${year}${month}${day}-${randomSuffix}`;
+            
+            // Format: INV-XXXXXX
+            document.getElementById("invoiceIdInput").value = `INV-${Math.floor(100000 + Math.random() * 900000)}`;
+            
+            // Local Dates and Times
+            document.getElementById("dateInput").value = `${day}/${month}/${year}`;
+            document.getElementById("timeInput").value = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        // ==========================================
+        // VENDOR PROFILE CONTROLLER ATTACHMENTS
+        // ==========================================
+        document.getElementById("vendorProfileSelect").addEventListener("change", function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (!selectedOption.value) return;
+
+            document.getElementById("customerNameInput").value = selectedOption.text.split("...")[0].split("Co.")[0].trim();
+            document.getElementById("customerPhoneInput").value = selectedOption.getAttribute("data-phone") || "";
+            document.getElementById("contractDiscountInput").value = (selectedOption.getAttribute("data-discount") || "0") + "%";
+            calculateTableTotals();
+        });
+
+        // ==========================================
+        // CALCULATOR MATRIX MATHEMATICS ENGINE
+        // ==========================================
+        function calculateTableTotals() {
+            let subtotal = 0;
+            const rows = document.querySelectorAll("#itemsTableBody tr");
+
+            rows.forEach(row => {
+                const qty = parseFloat(row.querySelector(".qty-field").value) || 0;
+                const rate = parseFloat(row.querySelector(".rate-field").value) || 0;
+                const amountField = row.querySelector(".amount-field");
+                
+                const lineTotal = qty * rate;
+                amountField.value = lineTotal.toFixed(2);
+                subtotal += lineTotal;
+            });
+
+            // Base Subtotal Box
+            document.getElementById("subtotalAmountInput").value = subtotal.toFixed(2);
+
+            // Fetch Vendor Contract Discount Percentage
+            const discountPercentage = parseFloat(document.getElementById("contractDiscountInput").value) || 0;
+            const discountedSubtotal = subtotal - (subtotal * (discountPercentage / 100));
+
+            // Tax Percentage Modifiers
+            const gstRate = parseFloat(document.getElementById("taxBracketSelect").value) || 0;
+            const grandTotal = discountedSubtotal + (discountedSubtotal * (gstRate / 100));
+
+            document.getElementById("totalAmountInput").value = grandTotal.toFixed(2);
+        }
+
+        // ==========================================
+        // DYNAMIC TABLE ROW MUTATION UTILITIES
+        // ==========================================
+        function createNewRowElement() {
+            const tbody = document.getElementById("itemsTableBody");
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+                <td><input type="text" class="sku-field" placeholder="SKU Code"></td>
+                <td><input type="text" class="name-field" placeholder="Product Description"></td>
+                <td><input type="number" class="qty-field" value="1" min="1"></td>
+                <td><input type="number" class="rate-field" value="0.00" step="0.01"></td>
+                <td><input type="number" class="amount-field" value="0.00" readonly></td>
+                <td><button type="button" class="btn-delete-row">X</button></td>
+            `;
+
+            // Row Event Hooks
+            tr.querySelector(".qty-field").addEventListener("input", calculateTableTotals);
+            tr.querySelector(".rate-field").addEventListener("input", calculateTableTotals);
+            tr.querySelector(".btn-delete-row").addEventListener("click", function() {
+                tr.remove();
+                calculateTableTotals();
+            });
+
+            tbody.appendChild(tr);
+        }
+
+        // ==========================================
+        // OBJECT ARRAY DATA STRUCTURING
+        // ==========================================
+        function parseItemsDataToPayload() {
             const items = [];
-            const rows = document.querySelectorAll("#itemsTableBody tr"); 
+            const rows = document.querySelectorAll("#itemsTableBody tr");
             
             rows.forEach(row => {
-                const inputs = row.querySelectorAll("input");
-                if (inputs.length >= 5) {
-                    const sku = inputs[0].value.trim();
-                    const pname = inputs[1].value.trim();
-                    const qty = parseFloat(inputs[2].value) || 0;
-                    const price = parseFloat(inputs[3].value) || 0;
-                    const amount = parseFloat(inputs[4].value) || (qty * price);
+                const sku = row.querySelector(".sku-field").value.trim();
+                const pname = row.querySelector(".name-field").value.trim();
+                const qty = parseFloat(row.querySelector(".qty-field").value) || 0;
+                const rate = parseFloat(row.querySelector(".rate-field").value) || 0;
+                const amount = parseFloat(row.querySelector(".amount-field").value) || 0;
 
-                    if (sku !== "" || pname !== "") {
-                        items.push({
-                            sku: sku,
-                            productName: pname || "Stock Item",
-                            quantity: qty,
-                            rate: price,
-                            amount: amount
-                        });
-                    }
+                if (sku !== "" || pname !== "") {
+                    items.push({
+                        sku: sku,
+                        productName: pname || "General Inventory Item",
+                        quantity: qty,
+                        rate: rate,
+                        amount: amount
+                    });
                 }
             });
             return items;
         }
 
-        async function handleBillSubmission() {
+        // ==========================================
+        // FIREBASE LIVE CLOUD TRANSMISSION SEQUENCE
+        // ==========================================
+        async function runCloudSubmissionPipeline() {
             const submitBtn = document.getElementById("submitBillBtn");
             const printBtn = document.getElementById("printBillBtn");
             const statusMsg = document.getElementById("dbStatusMessage");
@@ -413,34 +571,37 @@
             statusMsg.style.backgroundColor = "rgba(234, 179, 8, 0.15)";
             statusMsg.style.color = "#facc15"; 
             statusMsg.style.border = "1px solid rgba(234, 179, 8, 0.3)";
-            statusMsg.innerText = "⏳ Syncing transaction record to real-time cloud data logs...";
+            statusMsg.innerText = "⏳ Connecting and syncing transaction payload to real-time database...";
             
             submitBtn.disabled = true;
             submitBtn.innerText = "Submitting...";
 
-            const targetInvoiceId = document.getElementById("invoiceIdInput").value.trim() || "INV-" + Math.floor(Math.random() * 900000 + 100000);
+            const invoiceKeyId = document.getElementById("invoiceIdInput").value.trim();
 
             const payload = {
-                invoiceId: targetInvoiceId,
-                billNo: document.getElementById("billNoInput").value.trim() || "",
+                invoiceId: invoiceKeyId,
+                billNo: document.getElementById("billNoInput").value.trim(),
                 custName: document.getElementById("customerNameInput").value.trim() || "Walk-In Customer",
                 custPhone: document.getElementById("customerPhoneInput").value.trim() || "N/A",
+                customerClassification: document.getElementById("customerClassificationSelect").value,
                 paymentMethod: document.getElementById("paymentMethodSelect").value,
                 date: document.getElementById("dateInput").value,
                 time: document.getElementById("timeInput").value,
+                subtotal: parseFloat(document.getElementById("subtotalAmountInput").value || 0),
+                taxBracket: document.getElementById("taxBracketSelect").value + "%",
                 totalAmount: parseFloat(document.getElementById("totalAmountInput").value || 0),
-                items: getBillingItems()
+                items: parseItemsDataToPayload()
             };
 
             try {
-                await set(ref(db, "sales/" + targetInvoiceId), payload);
+                await set(ref(db, "sales/" + invoiceKeyId), payload);
                 
                 statusMsg.style.backgroundColor = "rgba(34, 197, 94, 0.15)";
                 statusMsg.style.color = "#4ade80";
                 statusMsg.style.border = "1px solid rgba(34, 197, 94, 0.3)";
-                statusMsg.innerText = `🎉 Invoice data verified and uploaded successfully! Reference: ${targetInvoiceId}`;
+                statusMsg.innerText = `🎉 Uploaded to Database Successfully! Reference Key: ${invoiceKeyId}`;
                 
-                printBtn.disabled = false; // Safely unlocks print workflow!
+                printBtn.disabled = false; // Unlocks the printer block configuration profiles
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Submit Bill";
 
@@ -449,7 +610,7 @@
                 statusMsg.style.backgroundColor = "rgba(239, 68, 68, 0.15)";
                 statusMsg.style.color = "#f87171";
                 statusMsg.style.border = "1px solid rgba(239, 68, 68, 0.3)";
-                statusMsg.innerText = "❌ Database transmission pipeline failed! Please check your network.";
+                statusMsg.innerText = "❌ Critical cloud write failure. Please check your data connectivity profiles.";
                 
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Submit Bill";
@@ -457,8 +618,25 @@
             }
         }
 
+        // ==========================================
+        // BOOT & INITIALIZATION HANDLERS
+        // ==========================================
         document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById("submitBillBtn").addEventListener("click", handleBillSubmission);
+            initInvoiceMetaFields();
+
+            // Set base calculation listeners on row 1
+            document.querySelector(".qty-field").addEventListener("input", calculateTableTotals);
+            document.querySelector(".rate-field").addEventListener("input", calculateTableTotals);
+            document.getElementById("taxBracketSelect").addEventListener("change", calculateTableTotals);
+            
+            document.querySelector(".btn-delete-row").addEventListener("click", function() {
+                this.closest("tr").remove();
+                calculateTableTotals();
+            });
+
+            // Action triggers binding hooks
+            document.getElementById("addItemLineBtn").addEventListener("click", createNewRowElement);
+            document.getElementById("submitBillBtn").addEventListener("click", runCloudSubmissionPipeline);
             document.getElementById("printBillBtn").addEventListener("click", () => {
                 window.print();
             });
