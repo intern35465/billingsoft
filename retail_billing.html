@@ -3,343 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Retail Billing Terminal</title>
-    <style>
-        /* Modern Professional Styling (Clean & Neat Layout) */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-            margin: 0;
-            padding: 20px;
-        }
-        .billing-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        .store-header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #eaeaea;
-            padding-bottom: 15px;
-        }
-        .store-header h2 {
-            margin: 0 0 5px 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #111;
-        }
-        .store-header p {
-            margin: 0;
-            color: #666;
-            font-size: 14px;
-        }
-        .meta-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        .input-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .input-group label {
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-            color: #555;
-        }
-        input, select {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-            outline: none;
-            background-color: #fff;
-        }
-        input[readonly] {
-            background-color: #e9ecef;
-            color: #495057;
-            cursor: not-allowed;
-        }
-        .wholesale-card {
-            background: #f1f3f5;
-            border-left: 4px solid #0d6efd;
-            padding: 15px;
-            margin-bottom: 25px;
-            border-radius: 0 4px 4px 0;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 25px 0;
-        }
-        th {
-            background-color: #212529;
-            color: #fff;
-            text-transform: uppercase;
-            font-size: 13px;
-            font-weight: 600;
-            padding: 12px;
-            text-align: left;
-        }
-        td {
-            padding: 10px;
-            border-bottom: 1px solid #dee2e6;
-        }
-        .table-input {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 8px;
-            margin: 0;
-        }
-        .btn-add {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .btn-remove {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .summary-box {
-            margin-top: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 10px;
-        }
-        .summary-row {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            width: 100%;
-            max-width: 400px;
-        }
-        .summary-row label {
-            font-weight: 600;
-            margin-right: 15px;
-            font-size: 14px;
-        }
-        .summary-row input {
-            width: 180px;
-            text-align: right;
-        }
-        .footer-thanks {
-            text-align: center;
-            margin-top: 40px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            color: #777;
-        }
-        .print-btn-container {
-            text-align: center;
-            margin-top: 30px;
-        }
-        .btn-print {
-            background-color: #0d6efd;
-            color: white;
-            border: none;
-            padding: 12px 35px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
-        }
-
-        /* 🖨️ PREMIUM MINIMALIST PRINT BILL FORMATTING */
-        @media print {
-            body {
-                background-color: #fff !important;
-                color: #000 !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                font-size: 14px;
-            }
-            .billing-container {
-                box-shadow: none !important;
-                padding: 0 !important;
-                max-width: 100% !important;
-            }
-            .no-print, button, .btn-add, .btn-remove, .btn-print {
-                display: none !important;
-            }
-            input, select {
-                border: none !important;
-                background: transparent !important;
-                color: #000 !important;
-                padding: 2px !important;
-                margin: 0 !important;
-                font-size: 14px !important;
-                appearance: none !important;
-                -webkit-appearance: none !important;
-                pointer-events: none !important;
-            }
-            .summary-row input {
-                text-align: right !important;
-            }
-            table {
-                border: 1px solid #111 !important;
-            }
-            th {
-                background-color: #f1f3f5 !important;
-                color: #000 !important;
-                border-bottom: 2px solid #111 !important;
-            }
-            td {
-                border-bottom: 1px solid #999 !important;
-            }
-        }
-    </style>
+    <title>BILLING SYSTEM</title>
 </head>
 <body>
 
-    <div class="billing-container">
-        
-        <div class="store-header">
-            <h2><b>STORE NAME</b></h2>
-            <p>Location: PALAKKAD | Ph No: 9876543210</p>
-        </div>
+    <center>
+        <h2>STORE NAME</h2>
+        <p>Location: PALAKKAD | Ph No: 9876543210</p>
+        <p><strong>GSTIN: 27ABCDE1234F1Z5</strong></p> </center>
+    <hr>
 
-        <form id="billingForm">
-            
-            <div class="meta-grid">
-                <div class="input-group">
+    <form id="billingForm">
+        
+        <table border="0" width="100%">
+            <tr>
+                <td width="50%" valign="top">
+                    <h3>INVOICE DETAILS</h3>
                     <label>Bill No:</label>
-                    <input type="text" id="billNo" readonly>
-                </div>
-                <div class="input-group">
-                    <label>Invoice ID (System generated):</label>
-                    <input type="text" id="invoiceId" readonly style="color: #0d6efd; font-weight: bold;">
-                </div>
-                <div class="input-group">
+                    <input type="text" id="billNo" readonly><br>
+                    
+                    <label>Invoice ID:</label>
+                    <input type="text" id="invoiceId" readonly><br>
+                    
                     <label>Date:</label>
-                    <input type="date" id="billDate" readonly>
-                </div>
-                <div class="input-group">
+                    <input type="date" id="billDate" readonly><br>
+                    
                     <label>Time:</label>
                     <input type="time" id="billTime" readonly>
-                </div>
-            </div>
-
-            <div class="meta-grid no-print">
-                <div class="input-group">
-                    <label>Customer Classification</label>
-                    <select id="customerTypeSelector">
-                        <option value="retail">Regular Retail Customer</option>
-                        <option value="wholesale">Wholesale Vendor</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="vendorDropdownArea" class="wholesale-card" style="display: none;">
-                <div class="meta-grid" style="margin-bottom: 0;">
-                    <div class="input-group">
-                        <label>Select Saved Vendor Profile</label>
-                        <select id="vendorSelector">
-                            <option value="">-- Choose Profile --</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label>Contract Discount</label>
-                        <input type="text" id="vendorDiscountBox" readonly value="0%">
-                    </div>
-                    <div class="input-group">
-                        <label>Outstanding Balance</label>
-                        <input type="text" id="vendorBalanceBox" readonly value="Rs. 0.00">
-                    </div>
-                </div>
-            </div>
-
-            <div class="meta-grid">
-                <div class="input-group">
-                    <label>Customer Name:</label>
-                    <input type="text" id="custName" placeholder="Enter customer name">
-                </div>
-                <div class="input-group">
-                    <label>Customer Phone No:</label>
-                    <input type="number" id="custPhone" placeholder="Enter contact number">
-                </div>
-            </div>
-
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th style="width: 15%;">SKU</th>
-                        <th style="width: 40%;">Product Name</th>
-                        <th style="width: 12%;">Quantity</th>
-                        <th style="width: 15%;">Rate</th>
-                        <th style="width: 15%;">Amount</th>
-                        <th class="no-print" style="width: 3%;">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="invoiceTableBody">
-                    </tbody>
-            </table>
-
-            <button type="button" class="btn-add no-print" id="addItemRowBtn">+ Add New Item</button>
-
-            <div class="summary-box">
-                <div class="summary-row">
-                    <label>Gross Price (Subtotal):</label>
-                    <input type="number" id="priceBox" readonly value="0.00">
-                </div>
-                <div class="summary-row no-print" style="margin: 5px 0;">
-                    <label>GSTIN Tax Profile:</label>
-                    <input type="text" value="GSTIN-27ABCDE1234F1Z5" readonly style="text-align: center;">
-                </div>
-                <div class="summary-row">
-                    <label>Tax Structure Selector:</label>
-                    <select id="gst" style="width: 180px;">
-                        <option value="0">GST 0%</option>
-                        <option value="5">GST 5%</option>
-                        <option value="12">GST 12%</option>
-                        <option value="18">GST 18%</option>
-                        <option value="28">GST 28%</option>
-                    </select>
-                </div>
-                <div class="summary-row" style="margin-top: 5px;">
-                    <label style="font-size: 18px; color: #111;">Total Invoice Amount:</label>
-                    <input type="number" id="totalAmount" readonly value="0.00" style="font-size: 18px; font-weight: bold; border: 1px solid #111; background-color: #fff;">
-                </div>
-                <div class="summary-row" style="margin-top: 5px;">
-                    <label>Payment Settlement:</label>
-                    <select style="width: 180px;">
+                </td>
+                
+                <td width="50%" valign="top" align="right">
+                    <h3>OPERATIONAL DETAILS</h3>
+                    <label>Billing Staff:</label>
+                    <input type="text" id="billingStaff" placeholder="Operator Name"><br>
+                    
+                    <label>Payment Method:</label>
+                    <select id="paymentMethod">
                         <option>Cash</option>
                         <option>UPI</option>
                         <option>Card</option>
                     </select>
-                </div>
-                <div class="summary-row" style="margin-top: 5px;">
-                    <label>Billing Operational Staff:</label>
-                    <input type="text" id="billingStaff" placeholder="Enter name">
-                </div>
-            </div>
+                </td>
+            </tr>
+        </table>
+        <hr>
 
-            <div class="footer-thanks">
-                THANK YOU
-            </div>
+        <label>Customer Type:</label>
+        <select id="customerTypeSelector">
+            <option value="retail">Regular Retail Customer</option>
+            <option value="wholesale">Wholesale Vendor</option>
+        </select>
+        <br><br>
 
-            <div class="print-btn-container no-print">
-                <button type="button" class="btn-print" id="printInvoiceBtn">🖨️ Print Document Bill</button>
-            </div>
-        </form>
-    </div>
+        <div id="vendorDropdownArea" style="display: none;">
+            <label>Select Saved Vendor:</label>
+            <select id="vendorSelector">
+                <option value="">-- Select Vendor --</option>
+            </select>
+            <br><br>
+            
+            <label>Contract Discount:</label>
+            <input type="text" id="vendorDiscountBox" readonly value="0%">
+            &nbsp;&nbsp;&nbsp;
+            <label>Outstanding Balance:</label>
+            <input type="text" id="vendorBalanceBox" readonly value="Rs. 0.00">
+            <br><br>
+        </div>
+
+        <label>Customer Name:</label>
+        <input type="text" id="custName">
+        <br><br>
+
+        <label>Customer Ph No:</label>
+        <input type="number" id="custPhone">
+        <br><br>
+
+        <table border="1" id="invoiceItemsTable" width="100%">
+            <thead>
+                <tr>
+                    <th>SKU</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Rate</th>
+                    <th>Amount</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="invoiceTableBody">
+                </tbody>
+        </table>
+
+        <br>
+        <button type="button" id="addItemRowBtn">+ Add Item Line</button>
+        <br><br>
+
+        <label>Price (Subtotal):</label>
+        <input type="number" id="priceBox" readonly value="0.00">
+        <br><br>
+
+        <label>Tax Bracket:</label>
+        <select id="gst">
+            <option value="0">GST 0%</option>
+            <option value="5">GST 5%</option>
+            <option value="12">GST 12%</option>
+            <option value="18">GST 18%</option>
+            <option value="28">GST 28%</option>
+        </select>
+        <br><br>
+
+        <label><strong>Total Amount:</strong></label>
+        <input type="number" id="totalAmount" readonly value="0.00">
+        <br><br><br>
+
+        <center>
+            <b>THANK YOU</b>
+            <br><br>
+            <button type="button" id="printInvoiceBtn">Print Bill</button>
+        </center>
+    </form>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -362,23 +143,32 @@
         let currentVendorDiscount = 0;
         let rowCounterIndex = 0;
 
-        // --- AUTOMATED INVOICE SEQUENCERS & DATE TIMESTAMP GENERATORS ---
-        let billNumber = localStorage.getItem("billNumber") || 1001;
-        let today = new Date();
-        let datePart = today.getFullYear() + String(today.getMonth() + 1).padStart(2, "0") + String(today.getDate()).padStart(2, "0");
-        
-        // Generate Dual Unique Numbers
-        document.getElementById("billNo").value = "BILL-" + datePart + "-" + billNumber;
-        document.getElementById("invoiceId").value = "INV-" + Math.floor(100000 + Math.random() * 900000);
-        
-        billNumber++;
-        localStorage.setItem("billNumber", billNumber);
+        // --- STABLE PERSISTENT ID SEQUENCER Engine ---
+        function initializeInvoiceIdentifiers() {
+            let today = new Date();
+            let datePart = today.getFullYear() + String(today.getMonth() + 1).padStart(2, "0") + String(today.getDate()).padStart(2, "0");
+            
+            // Check session state first to safeguard data values against clean refreshes
+            let sessionBillNo = sessionStorage.getItem("currentBillNo");
+            let sessionInvId = sessionStorage.getItem("currentInvId");
 
-        document.getElementById("billDate").value = new Date().toISOString().split("T")[0];
-        let now = new Date();
-        document.getElementById("billTime").value = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
+            if (!sessionBillNo) {
+                let persistentCount = localStorage.getItem("billNumberCounter") || 1001;
+                sessionBillNo = "BILL-" + datePart + "-" + persistentCount;
+                sessionInvId = "INV-" + Math.floor(100000 + Math.random() * 900000);
+                
+                localStorage.setItem("billNumberCounter", Number(persistentCount) + 1);
+                sessionStorage.setItem("currentBillNo", sessionBillNo);
+                sessionStorage.setItem("currentInvId", sessionInvId);
+            }
 
-        // --- ADD AND DEPOSIT ITEM LINE ARRAYS ---
+            document.getElementById("billNo").value = sessionBillNo;
+            document.getElementById("invoiceId").value = sessionInvId;
+            document.getElementById("billDate").value = today.toISOString().split("T")[0];
+            document.getElementById("billTime").value = String(today.getHours()).padStart(2, "0") + ":" + String(today.getMinutes()).padStart(2, "0");
+        }
+
+        // --- RELIABLE EVENT DRIVEN GRID GENERATOR ---
         window.addNewRowItem = function() {
             rowCounterIndex++;
             const tbody = document.getElementById("invoiceTableBody");
@@ -386,17 +176,25 @@
             newRow.id = `billRow_${rowCounterIndex}`;
             
             newRow.innerHTML = `
-                <td><input type="text" id="pcode_${rowCounterIndex}" data-index="${rowCounterIndex}" class="table-input"></td>
-                <td><input type="text" id="pname_${rowCounterIndex}" class="table-input" readonly></td>
-                <td><input type="number" id="qty_${rowCounterIndex}" data-index="${rowCounterIndex}" min="1" value="1" class="table-input"></td>
-                <td><input type="number" id="rate_${rowCounterIndex}" class="table-input" readonly></td>
-                <td><input type="number" id="amount_${rowCounterIndex}" class="table-input" readonly value="0.00"></td>
-                <td class="no-print"><button type="button" class="btn-remove" onclick="removeBillRowLine('${newRow.id}')">X</button></td>
+                <td><input type="text" id="pcode_${rowCounterIndex}" data-id="${rowCounterIndex}"></td>
+                <td><input type="text" id="pname_${rowCounterIndex}" readonly></td>
+                <td><input type="number" id="qty_${rowCounterIndex}" data-id="${rowCounterIndex}" min="1" value="1"></td>
+                <td><input type="number" id="rate_${rowCounterIndex}" readonly></td>
+                <td><input type="number" id="amount_${rowCounterIndex}" readonly value="0.00"></td>
+                <td><button type="button" onclick="removeBillRowLine('${newRow.id}')">X</button></td>
             `;
             tbody.appendChild(newRow);
 
-            document.getElementById(`pcode_${rowCounterIndex}`).addEventListener("keyup", (e) => fetchSkuProductRowData(e.target.dataset.index));
-            document.getElementById(`qty_${rowCounterIndex}`).addEventListener("input", () => evaluateMasterTotalsCalculations());
+            // Directly attach standard event properties to resolve input blocking bugs
+            const codeInput = document.getElementById(`pcode_${rowCounterIndex}`);
+            const qtyInput = document.getElementById(`qty_${rowCounterIndex}`);
+
+            codeInput.onkeyup = function(e) {
+                fetchSkuProductRowData(e.target.dataset.id);
+            };
+            qtyInput.oninput = function() {
+                evaluateMasterTotalsCalculations();
+            };
         };
 
         window.removeBillRowLine = function(rowId) {
@@ -407,31 +205,30 @@
             }
         };
 
-        // --- SKU REALTIME DATABASE EXTRACTOR ---
+        // --- REALTIME BACKEND SKU MATCHING LOOPS ---
         async function fetchSkuProductRowData(index) {
             const sku = document.getElementById(`pcode_${index}`).value.trim();
             if (!sku) return;
 
-            const snapshot = await get(ref(db, "inventory"));
-            if (snapshot.exists()) {
-                const products = snapshot.val();
-                for (let key in products) {
-                    if (String(products[key].sku) === String(sku)) {
-                        document.getElementById(`pname_${index}`).value = products[key].productName;
-                        document.getElementById(`rate_${index}`).value = products[key].price;
-                        
-                        evaluateMasterTotalsCalculations();
-                        return;
+            try {
+                const snapshot = await get(ref(db, "inventory"));
+                if (snapshot.exists()) {
+                    const products = snapshot.val();
+                    for (let key in products) {
+                        if (String(products[key].sku) === String(sku)) {
+                            document.getElementById(`pname_${index}`).value = products[key].productName || "";
+                            document.getElementById(`rate_${index}`).value = products[key].price || 0;
+                            evaluateMasterTotalsCalculations();
+                            return;
+                        }
                     }
                 }
+            } catch (err) {
+                console.error("Database lookup error: ", err);
             }
-            document.getElementById(`pname_${index}`).value = "";
-            document.getElementById(`rate_${index}`).value = "";
-            document.getElementById(`amount_${index}`).value = "0.00";
-            evaluateMasterTotalsCalculations();
         }
 
-        // --- MATH RULES COMPUTATION ENGINE ---
+        // --- INDEPENDENT MATHEMATICAL ENGINE ---
         window.evaluateMasterTotalsCalculations = function() {
             let totalGrossSubtotal = 0;
             const gstPercent = Number(document.getElementById("gst").value) || 0;
@@ -439,18 +236,21 @@
             const rows = document.querySelectorAll("#invoiceTableBody tr");
             rows.forEach(row => {
                 const index = row.id.split("_")[1];
-                const qty = Number(document.getElementById(`qty_${index}`).value) || 0;
-                const rate = Number(document.getElementById(`rate_${index}`).value) || 0;
-                
-                let lineGross = qty * rate;
-                totalGrossSubtotal += lineGross;
-                
-                document.getElementById(`amount_${index}`).value = lineGross.toFixed(2);
+                const qtyElement = document.getElementById(`qty_${index}`);
+                const rateElement = document.getElementById(`rate_${index}`);
+                const amountElement = document.getElementById(`amount_${index}`);
+
+                if (qtyElement && rateElement && amountElement) {
+                    const qty = Number(qtyElement.value) || 0;
+                    const rate = Number(rateElement.value) || 0;
+                    let lineGross = qty * rate;
+                    totalGrossSubtotal += lineGross;
+                    amountElement.value = lineGross.toFixed(2);
+                }
             });
 
             let discountDeduction = (totalGrossSubtotal * currentVendorDiscount) / 100;
             let netSubtotal = totalGrossSubtotal - discountDeduction;
-
             let gstAmount = (netSubtotal * gstPercent) / 100;
             let finalInvoiceTotal = netSubtotal + gstAmount;
 
@@ -458,7 +258,7 @@
             document.getElementById("totalAmount").value = finalInvoiceTotal.toFixed(2);
         };
 
-        // --- WHOLESALE DATA SYNC MODULE ---
+        // --- WHOLESALE DATA SYNC PANELS ---
         const customerTypeSelector = document.getElementById("customerTypeSelector");
         const vendorDropdownArea = document.getElementById("vendorDropdownArea");
         const vendorSelector = document.getElementById("vendorSelector");
@@ -485,13 +285,12 @@
                     globalVendorsObject = snapshot.val();
                     for (let key in globalVendorsObject) {
                         const vendor = globalVendorsObject[key];
-                        // FIX: Pull company name explicitly so raw Firebase structural push strings don't display
                         const companyName = vendor.companyName || vendor.vendorName || vendor.name || key;
                         vendorSelector.innerHTML += `<option value="${key}">${companyName}</option>`;
                     }
                 }
             } catch (err) {
-                console.error("Error linking wholesale nodes:", err);
+                console.error("Error reading vendor values: ", err);
             }
         }
 
@@ -500,7 +299,6 @@
             if (selectedKey && globalVendorsObject[selectedKey]) {
                 const vendorData = globalVendorsObject[selectedKey];
 
-                // FIX: Map actual legible names into fields instead of raw keys
                 document.getElementById("custName").value = vendorData.companyName || vendorData.vendorName || vendorData.name || selectedKey;
                 document.getElementById("custPhone").value = vendorData.phone || vendorData.contact || "";
                 
@@ -517,11 +315,17 @@
             evaluateMasterTotalsCalculations();
         });
 
-        // Initialize defaults
+        // Set listeners and initialize terminal instance
         document.getElementById("gst").addEventListener("change", evaluateMasterTotalsCalculations);
         document.getElementById("addItemRowBtn").addEventListener("click", window.addNewRowItem);
-        document.getElementById("printInvoiceBtn").addEventListener("click", () => window.print());
+        document.getElementById("printInvoiceBtn").addEventListener("click", () => {
+            // Clear current invoice session data before firing printing prompts so a brand new ID spawns next order load
+            sessionStorage.removeItem("currentBillNo");
+            sessionStorage.removeItem("currentInvId");
+            window.print();
+        });
 
+        initializeInvoiceIdentifiers();
         window.addNewRowItem();
     </script>
 </body>
