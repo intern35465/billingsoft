@@ -111,13 +111,15 @@ h1{
     0 0 20px #ff7200,
     0 0 35px #ff7200;
 }
-/* CONTAINER TO FORCE THE BUTTON TO A NEW ROW AND CENTER IT */
+/* FORCE THE CONTAINER TO BE FULL WIDTH AND CENTER EVERYTHING INSIDE IT */
 .footer-container {
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center;     /* Centers vertically if needed */
     width: 100%;
-    text-align: center;
-    margin-top: 40px;
+    margin-top: 50px;        /* Pushes it safely below the floating reports card */
     margin-bottom: 20px;
-    clear: both;
+    box-sizing: border-box;
 }
 
 /* THE BUTTON STYLING */
@@ -126,13 +128,14 @@ h1{
     color: white;
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 10px;
-    padding: 14px 35px; /* Slightly adjusted padding for mobile screens */
+    padding: 14px 45px;
     font-size: 15px;
     font-weight: bold;
     text-decoration: none;
     display: inline-block;
     transition: 0.4s;
     box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    text-align: center;
 }
 
 /* THEMED GLOW ON HOVER/TAP */
