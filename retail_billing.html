@@ -6,15 +6,15 @@
     <title>BILLING SYSTEM</title>  
     <link rel="stylesheet" href="retail_billing.css">  
     <style>  
-        /* --- HIGH VISIBILITY MOBILE/WEB WRITING CONTROLS --- */
+        /* --- HIGH VISIBILITY WRITING CONTROLS --- */
         input[type="text"], 
         input[type="number"], 
         input[type="date"], 
         input[type="time"], 
         select {
-            background-color: #1e293b !important;
+            background-color: #271c15 !important;
             color: #ffffff !important;
-            border: 1px solid #475569 !important;
+            border: 1px solid #4a372c !important;
             padding: 8px 12px !important;
             font-size: 15px !important;
             font-weight: 600 !important;
@@ -23,13 +23,13 @@
 
         input[readonly] {
             background-color: rgba(255, 255, 255, 0.05) !important;
-            color: #94a3b8 !important;
+            color: #a1a1aa !important;
             border-color: rgba(255, 255, 255, 0.1) !important;
         }
 
-        /* Standard Web Button Style Overrides */
+        /* Web Button Style Overrides */
         #addItemRowBtn {
-            background-color: #22c55e;
+            background-color: #f97316;
             color: white;
             border: none;
             padding: 10px 18px;
@@ -39,7 +39,7 @@
         }
 
         .btn-action-primary {
-            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            background: linear-gradient(135deg, #f97316, #d97706);
             color: white;
             padding: 12px 24px;
             font-size: 15px;
@@ -63,8 +63,8 @@
         }
 
         button:disabled {
-            background: #475569 !important;
-            color: #94a3b8 !important;
+            background: #3f3f46 !important;
+            color: #71717a !important;
             opacity: 0.5;
             cursor: not-allowed;
         }
@@ -85,7 +85,6 @@
         @media print {  
             @page { margin: 12mm; size: A4 portrait; }
 
-            /* Hide web navigation controls, row controls, and action buttons entirely */  
             button,   
             #addItemRowBtn,   
             .no-print,   
@@ -94,7 +93,6 @@
                 display: none !important;   
             }  
 
-            /* Strip input containers and dropdown menus of background shading and input boxes */  
             input, select {  
                 border: none !important;  
                 background: transparent !important;  
@@ -102,7 +100,6 @@
                 box-shadow: none !important;  
                 appearance: none !important;  
                 -webkit-appearance: none !important;  
-                -moz-appearance: none !important;  
                 color: #000 !important;  
                 padding: 0 !important;  
                 margin: 0 !important;  
@@ -111,7 +108,6 @@
                 font-weight: normal !important;
             }  
 
-            /* Clean up table lines for physical paper rendering */  
             table {  
                 border-collapse: collapse !important;  
                 width: 100% !important;  
@@ -121,14 +117,13 @@
                 background: #f2f2f2 !important;
                 color: #000 !important;
                 font-weight: bold !important;
-            }
+            }  
             th, td {  
                 border: 1px solid #000 !important;  
                 padding: 8px !important;  
                 color: #000 !important;
             }  
 
-            /* Keep left-side and right-side structures beautifully aligned on paper */  
             body {  
                 background: #fff !important;  
                 color: #000 !important;  
@@ -146,8 +141,8 @@
 <body>  
 
 <center>  
-    <h2>ZIBILLZ DOTCOM</h2>  
-    <p>Location: LOCATION | Ph No: 0000000234</p>  
+    <h2>STORE NAME</h2>  
+    <p>Location: PALAKKAD | Ph No: 9876543210</p>  
     <p><strong>GSTIN: 27ABCDE1234F1Z5</strong></p>  
 </center>  
 <hr>  
@@ -238,8 +233,11 @@
     <button type="button" id="addItemRowBtn" class="no-print">+ Add Item Line</button>  
     <br><br>  
 
-    <label>Price (Subtotal):</label>  
+    <label>Gross Items Subtotal:</label>  
     <input type="number" id="priceBox" readonly value="0.00"><br><br>  
+
+    <label>Vendor Discount Deduction:</label>  
+    <input type="number" id="discountDeductionBox" readonly value="0.00"><br><br>
 
     <label>Tax Bracket:</label>  
     <select id="gst">  
@@ -251,11 +249,11 @@
     </select>  
     <br><br>  
 
-    <label><strong>Total Amount:</strong></label>  
+    <label><strong>Total Amount (Inc. Tax):</strong></label>  
     <input type="number" id="totalAmount" readonly value="0.00">  
     <br><br><br>  
 
-    <div id="statusNotificationArea"></div>
+    <div id="statusNotificationArea"></div>  
 
     <center>  
         <b>THANK YOU</b>  
@@ -286,7 +284,6 @@
     let currentVendorDiscount = 0;  
     let rowCounterIndex = 0;  
 
-    // --- STABLE PERSISTENT ID SEQUENCER ENGINE ---  
     function initializeInvoiceIdentifiers() {  
         let today = new Date();  
         let datePart = today.getFullYear() + String(today.getMonth() + 1).padStart(2, "0") + String(today.getDate()).padStart(2, "0");  
@@ -310,7 +307,6 @@
         document.getElementById("billTime").value = String(today.getHours()).padStart(2, "0") + ":" + String(today.getMinutes()).padStart(2, "0");  
     }  
 
-    // --- RELIABLE EVENT DRIVEN GRID GENERATOR ---  
     window.addNewRowItem = function() {  
         rowCounterIndex++;  
         const tbody = document.getElementById("invoiceTableBody");  
@@ -346,7 +342,6 @@
         }  
     };  
 
-    // --- REALTIME BACKEND SKU MATCHING LOOPS ---  
     async function fetchSkuProductRowData(index) {  
         const sku = document.getElementById(`pcode_${index}`).value.trim();  
         if (!sku) return;  
@@ -369,7 +364,7 @@
         }  
     }  
 
-    // --- INDEPENDENT MATHEMATICAL ENGINE ---  
+    // --- MATH CONTROLLER CORE ---  
     window.evaluateMasterTotalsCalculations = function() {  
         let totalGrossSubtotal = 0;  
         const gstPercent = Number(document.getElementById("gst").value) || 0;  
@@ -390,16 +385,23 @@
             }  
         });  
 
+        // Live calculation engine fix
         let discountDeduction = (totalGrossSubtotal * currentVendorDiscount) / 100;  
         let netSubtotal = totalGrossSubtotal - discountDeduction;  
         let gstAmount = (netSubtotal * gstPercent) / 100;  
         let finalInvoiceTotal = netSubtotal + gstAmount;  
 
+        // Sync visual data profile selectors
+        const vendorDiscountBox = document.getElementById("vendorDiscountBox");  
+        if (vendorDiscountBox) {  
+            vendorDiscountBox.value = currentVendorDiscount + "%";  
+        }  
+
         document.getElementById("priceBox").value = totalGrossSubtotal.toFixed(2);  
+        document.getElementById("discountDeductionBox").value = discountDeduction.toFixed(2);
         document.getElementById("totalAmount").value = finalInvoiceTotal.toFixed(2);  
     };  
 
-    // --- WHOLESALE DATA SYNC PANELS ---  
     const customerTypeSelector = document.getElementById("customerTypeSelector");  
     const vendorDropdownArea = document.getElementById("vendorDropdownArea");  
     const vendorSelector = document.getElementById("vendorSelector");  
@@ -452,88 +454,91 @@
             currentVendorDiscount = 0;  
             document.getElementById("vendorDiscountBox").value = "0%";  
             document.getElementById("vendorBalanceBox").value = "Rs. 0.00";  
+            document.getElementById("custName").value = "";  
+            document.getElementById("custPhone").value = "";  
         }  
         evaluateMasterTotalsCalculations();  
     });  
 
-    // --- CORE TRANSACTION ARRAY PACKAGER & SUBMITTER ---
-    function captureInvoiceItemsAsPayload() {
-        const itemPayloadArray = [];
-        const rows = document.querySelectorAll("#invoiceTableBody tr");
+    function captureInvoiceItemsAsPayload() {  
+        const itemPayloadArray = [];  
+        const rows = document.querySelectorAll("#invoiceTableBody tr");  
         
-        rows.forEach(row => {
-            const index = row.id.split("_")[1];
-            const skuCode = document.getElementById(`pcode_${index}`).value.trim();
-            const prodName = document.getElementById(`pname_${index}`).value.trim();
-            const quantity = Number(document.getElementById(`qty_${index}`).value) || 0;
-            const rateCost = Number(document.getElementById(`rate_${index}`).value) || 0;
-            const rowTotal = Number(document.getElementById(`amount_${index}`).value) || 0;
+        rows.forEach(row => {  
+            const index = row.id.split("_")[1];  
+            const skuCode = document.getElementById(`pcode_${index}`).value.trim();  
+            const prodName = document.getElementById(`pname_${index}`).value.trim();  
+            const quantity = Number(document.getElementById(`qty_${index}`).value) || 0;  
+            const rateCost = Number(document.getElementById(`rate_${index}`).value) || 0;  
+            const rowTotal = Number(document.getElementById(`amount_${index}`).value) || 0;  
 
-            if (skuCode !== "" || prodName !== "") {
-                itemPayloadArray.push({
-                    sku: skuCode,
-                    productName: prodName || "General Store Item",
-                    quantity: quantity,
-                    rate: rateCost,
-                    amount: rowTotal
-                });
-            }
-        });
-        return itemPayloadArray;
-    }
+            if (skuCode !== "" || prodName !== "") {  
+                itemPayloadArray.push({  
+                    sku: skuCode,  
+                    productName: prodName || "General Store Item",  
+                    quantity: quantity,  
+                    rate: rateCost,  
+                    amount: rowTotal  
+                });  
+            }  
+        });  
+        return itemPayloadArray;  
+    }  
 
-    async function executeInvoiceSubmissionPipeline() {
-        const submitBtn = document.getElementById("submitInvoiceBtn");
-        const printBtn = document.getElementById("printInvoiceBtn");
-        const statusArea = document.getElementById("statusNotificationArea");
+    async function executeInvoiceSubmissionPipeline() {  
+        const submitBtn = document.getElementById("submitInvoiceBtn");  
+        const printBtn = document.getElementById("printInvoiceBtn");  
+        const statusArea = document.getElementById("statusNotificationArea");  
 
-        statusArea.style.display = "block";
-        statusArea.style.background = "rgba(234, 179, 8, 0.2)";
-        statusArea.style.color = "#fbbf24";
-        statusArea.innerText = "⏳ Pushing invoice payload to real-time database...";
+        statusArea.style.display = "block";  
+        statusArea.style.background = "rgba(234, 179, 8, 0.2)";  
+        statusArea.style.color = "#fbbf24";  
+        statusArea.innerText = "⏳ Pushing invoice payload to real-time database...";  
         
-        submitBtn.disabled = true;
+        submitBtn.disabled = true;  
 
-        const targetInvoiceId = document.getElementById("invoiceId").value.trim();
+        const targetInvoiceId = document.getElementById("invoiceId").value.trim();  
 
-        const finalBillPayload = {
-            invoiceId: targetInvoiceId,
-            billNo: document.getElementById("billNo").value.trim(),
-            date: document.getElementById("billDate").value,
-            time: document.getElementById("billTime").value,
-            billingStaff: document.getElementById("billingStaff").value.trim() || "System Admin",
-            paymentMethod: document.getElementById("paymentMethod").value,
-            customerType: document.getElementById("customerTypeSelector").value,
-            customerName: document.getElementById("custName").value.trim() || "Walk-In Customer",
-            customerPhone: document.getElementById("custPhone").value.trim() || "N/A",
-            subtotal: Number(document.getElementById("priceBox").value) || 0,
-            taxBracket: document.getElementById("gst").value + "%",
-            totalAmount: Number(document.getElementById("totalAmount").value) || 0,
-            items: captureInvoiceItemsAsPayload()
-        };
+        const finalBillPayload = {  
+            invoiceId: targetInvoiceId,  
+            billNo: document.getElementById("billNo").value.trim(),  
+            date: document.getElementById("billDate").value,  
+            time: document.getElementById("billTime").value,  
+            billingStaff: document.getElementById("billingStaff").value.trim() || "System Admin",  
+            paymentMethod: document.getElementById("paymentMethod").value,  
+            customerType: document.getElementById("customerTypeSelector").value,  
+            customerName: document.getElementById("custName").value.trim() || "Walk-In Customer",  
+            customerPhone: document.getElementById("custPhone").value.trim() || "N/A",  
+            subtotal: Number(document.getElementById("priceBox").value) || 0,  
+            discountDeduction: Number(document.getElementById("discountDeductionBox").value) || 0,
+            vendorDiscountPercent: currentVendorDiscount + "%",
+            taxBracket: document.getElementById("gst").value + "%",  
+            totalAmount: Number(document.getElementById("totalAmount").value) || 0,  
+            items: captureInvoiceItemsAsPayload()  
+        };  
 
-        try {
-            await set(ref(db, "sales/" + targetInvoiceId), finalBillPayload);
-            
-            statusArea.style.background = "rgba(34, 197, 94, 0.2)";
-            statusArea.style.color = "#4ade80";
-            statusArea.innerText = `🎉 Invoice saved to Firebase! Key: ${targetInvoiceId}`;
-            
-            printBtn.disabled = false; // Safely unlocks print button only after success
-            submitBtn.disabled = false;
+        try {  
+            await set(ref(db, "sales/" + targetInvoiceId), finalBillPayload);  
+              
+            statusArea.style.background = "rgba(34, 197, 94, 0.2)";  
+            statusArea.style.color = "#4ade80";  
+            statusArea.innerText = `🎉 Invoice saved to Firebase! Key: ${targetInvoiceId}`;  
+              
+            printBtn.disabled = false;   
+            submitBtn.disabled = false;  
 
-        } catch (error) {
-            console.error("Data push failed: ", error);
-            statusArea.style.background = "rgba(239, 68, 68, 0.2)";
-            statusArea.style.color = "#f87171";
-            statusArea.innerText = "❌ Database transmission failed. Please verify connectivity profiles.";
-            submitBtn.disabled = false;
-        }
-    }
+        } catch (error) {  
+            console.error("Data push failed: ", error);  
+            statusArea.style.background = "rgba(239, 68, 68, 0.2)";  
+            statusArea.style.color = "#f87171";  
+            statusArea.innerText = "❌ Database transmission failed. Please verify connectivity profiles.";  
+            submitBtn.disabled = false;  
+        }  
+    }  
 
     document.getElementById("gst").addEventListener("change", evaluateMasterTotalsCalculations);  
     document.getElementById("addItemRowBtn").addEventListener("click", window.addNewRowItem);  
-    document.getElementById("submitInvoiceBtn").addEventListener("click", executeInvoiceSubmissionPipeline);
+    document.getElementById("submitInvoiceBtn").addEventListener("click", executeInvoiceSubmissionPipeline);  
 
     document.getElementById("printInvoiceBtn").addEventListener("click", () => {  
         sessionStorage.removeItem("currentBillNo");  
