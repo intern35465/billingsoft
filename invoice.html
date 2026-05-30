@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice Tracking Dashboard</title>
     <style>
-        /* Modern Dashboard System Aesthetics */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f4f6f9;
@@ -40,7 +39,6 @@
             padding-left: 8px;
         }
 
-        /* Search Layout Bars */
         .search-box {
             display: flex;
             gap: 10px;
@@ -77,7 +75,6 @@
             background: #0b5ed7;
         }
 
-        /* Alerts and Messaging Channels */
         #result {
             font-size: 14px;
             font-weight: 600;
@@ -89,7 +86,6 @@
         .msg-success { background: #d1e7dd; color: #0f5132; display: block !important; }
         .msg-error { background: #f8d7da; color: #842029; display: block !important; }
 
-        /* Dynamic Structured Overview Layout Lists */
         .meta-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -105,7 +101,7 @@
             flex-direction: column;
         }
 
-        .meta-item span class-label {
+        .meta-item .class-label {
             font-size: 11px;
             text-transform: uppercase;
             font-weight: 700;
@@ -113,13 +109,12 @@
             margin-bottom: 4px;
         }
 
-        .meta-item span class-value {
+        .meta-item .class-value {
             font-size: 15px;
             font-weight: 500;
             color: #212529;
         }
 
-        /* Status UI Component Badges */
         .badge {
             display: inline-block;
             padding: 4px 8px;
@@ -130,9 +125,7 @@
             width: fit-content;
         }
         .badge-paid { background-color: #d1e7dd; color: #0f5132; }
-        .badge-delivered { background-color: #cff4fc; color: #055160; }
 
-        /* Transactional Details Ledger Matrix Table */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -174,8 +167,8 @@
         <h2>Invoice Tracking System</h2>
         
         <div class="search-box">
-            <input type="text" id="invoice" placeholder="Enter Invoice ID (e.g., INV-123456)">
-            <button onclick="trackInvoice()">Track Invoice</button>
+            <input type="text" id="invoiceInput" placeholder="Enter Invoice ID or Bill No">
+            <button id="trackBtn">Track Invoice</button>
         </div>
 
         <div id="result"></div>
@@ -185,87 +178,156 @@
             <h3>Invoice Overview</h3>
             <div class="meta-grid">
                 <div class="meta-item">
-                    <span class="class-label">Invoice ID Reference</span>
+                    <span class="class-label">Bill / Invoice Reference</span>
                     <span class="class-value" id="invoiceId" style="font-weight: bold; color: #0d6efd;"></span>
                 </div>
                 <div class="meta-item">
-                    <span class="class-label">Customer Profile Name</span>
-                    <span class="class-value">Vyshnav Saran</span>
+                    <span class="class-label">Customer Name</span>
+                    <span class="class-value" id="custName"></span>
+                </div>
+                <div class="meta-item">
+                    <span class="class-label">Customer Phone</span>
+                    <span class="class-value" id="custPhone"></span>
                 </div>
                 <div class="meta-item">
                     <span class="class-label">Settlement Channel</span>
-                    <span class="class-value">UPI Terminal</span>
+                    <span class="class-value" id="paymentMethod"></span>
                 </div>
                 <div class="meta-item">
-                    <span class="class-label">Financial Invoice Status</span>
+                    <span class="class-label">Date & Time</span>
+                    <span class="class-value" id="billDateTime"></span>
+                </div>
+                <div class="meta-item">
+                    <span class="class-label">Financial Status</span>
                     <span><g class="badge badge-paid">Paid Settlement</g></span>
-                </div>
-                <div class="meta-item">
-                    <span class="class-label">Logistic Delivery Status</span>
-                    <span><g class="badge badge-delivered">Delivered Successfully</g></span>
                 </div>
             </div>
 
             <h3>Order Statement Ledger</h3>
-            <table>
+            <table id="itemsTable">
                 <thead>
                     <tr>
+                        <th>SKU Code</th>
                         <th>Item Description</th>
-                        <th>Quantity Order</th>
-                        <th>Unit Valuation Rate</th>
+                        <th>Quantity</th>
+                        <th>Rate</th>
                         <th style="text-align: right;">Line Subtotal</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>Premium Jeerakasala Rice</td>
-                        <td>2 kg</td>
-                        <td>₹60.00 / kg</td>
-                        <td style="text-align: right; font-weight: 500;">₹120.00</td>
-                    </tr>
-                    <tr>
-                        <td>Fresh Cow Milk Packet</td>
-                        <td>2 Units</td>
-                        <td>₹30.00 / Unit</td>
-                        <td style="text-align: right; font-weight: 500;">₹60.00</td>
-                    </tr>
-                    <tr>
-                        <td>Gourmet Sliced Bread</td>
-                        <td>2 Packets</td>
-                        <td>₹40.00 / Packet</td>
-                        <td style="text-align: right; font-weight: 500;">₹80.00</td>
-                    </tr>
-                    <tr class="grand-total-row">
-                        <th colspan="3" style="text-align: left; font-weight: 700;">Gross Invoice Grand Total Value:</th>
-                        <th style="text-align: right; font-weight: 700; color: #212529; font-size: 16px;">₹260.00</th>
-                    </tr>
-                </tbody>
+                <tbody id="itemsTableBody">
+                    </tbody>
             </table>
         </div>
     </div>
 
-    <script>
-        function trackInvoice() {
-            const invoiceInput = document.getElementById("invoice").value.trim();
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Same configuration configuration from your billing application
+        const firebaseConfig = {
+            apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
+            authDomain: "zbillz-f4798.firebaseapp.com",
+            databaseURL: "https://zbillz-f4798-default-rtdb.firebaseio.com",
+            projectId: "zbillz-f4798",
+            storageBucket: "zbillz-f4798.firebasestorage.app",
+            messagingSenderId: "495466751324",
+            appId: "1:495466751324:web:324e3440f13fad0acdcd99"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        async function performInvoiceLookup() {
+            const searchKey = document.getElementById("invoiceInput").value.trim();
             const resultBox = document.getElementById("result");
             const dashboardBox = document.getElementById("dashboard");
-            const idDisplay = document.getElementById("invoiceId");
 
-            // Input Validation Boundary Guard
-            if (invoiceInput === "") {
+            if (!searchKey) {
                 resultBox.className = "msg-error";
-                resultBox.innerHTML = "⚠️ Warning: Please key in a valid Invoice tracking lookup sequence identifier.";
+                resultBox.innerHTML = "⚠️ Please enter an Invoice ID or Bill Number.";
                 dashboardBox.style.display = "none";
                 return;
             }
 
-            // Target mapping and interface render responses
-            idDisplay.innerHTML = invoiceInput;
-            resultBox.className = "msg-success";
-            resultBox.innerHTML = "✔️ Success: Database Record Matching Invoice File Located Verified.";
-            dashboardBox.style.display = "block";
-        }
-    </script>
+            try {
+                // Fetching sales logs node from Realtime Database
+                const snapshot = await get(ref(db, "sales"));
+                if (snapshot.exists()) {
+                    const salesData = snapshot.val();
+                    let recordFound = null;
 
+                    // Search for matching invoice block record inside database node
+                    for (let id in salesData) {
+                        if (id === searchKey || salesData[id].billNo === searchKey || salesData[id].invoiceId === searchKey) {
+                            recordFound = salesData[id];
+                            break;
+                        }
+                    }
+
+                    if (recordFound) {
+                        resultBox.className = "msg-success";
+                        resultBox.innerHTML = "✔️ Invoice Record Located Successfully.";
+                        
+                        // Populate Overview Panel Details safely
+                        document.getElementById("invoiceId").innerText = recordFound.billNo || recordFound.invoiceId || searchKey;
+                        document.getElementById("custName").innerText = recordFound.customerName || recordFound.custName || "N/A";
+                        document.getElementById("custPhone").innerText = recordFound.customerPhone || recordFound.custPhone || "N/A";
+                        document.getElementById("paymentMethod").innerText = recordFound.paymentMethod || "Cash";
+                        document.getElementById("billDateTime").innerText = `${recordFound.date || ''} ${recordFound.time || ''}`;
+
+                        // Dynamically build individual product row elements
+                        const itemsTableBody = document.getElementById("itemsTableBody");
+                        itemsTableBody.innerHTML = ""; // Clear existing rows
+
+                        if (recordFound.items && Array.isArray(recordFound.items)) {
+                            recordFound.items.forEach(item => {
+                                const row = `
+                                    <tr>
+                                        <td>${item.sku || 'N/A'}</td>
+                                        <td>${item.productName || item.name || 'N/A'}</td>
+                                        <td>${item.quantity || item.qty || 1}</td>
+                                        <td>₹${parseFloat(item.rate || item.price || 0).toFixed(2)}</td>
+                                        <td style="text-align: right; font-weight: 500;">₹${parseFloat(item.amount || 0).toFixed(2)}</td>
+                                    </tr>
+                                `;
+                                itemsTableBody.innerHTML += row;
+                            });
+                        }
+
+                        // Append calculation footer summary row dynamically
+                        const footerRow = `
+                            <tr class="grand-total-row">
+                                <th colspan="4" style="text-align: left; font-weight: 700;">Gross Invoice Grand Total (Incl. Taxes/Discounts):</th>
+                                <th style="text-align: right; font-weight: 700; color: #212529; font-size: 16px;">₹${parseFloat(recordFound.totalAmount || recordFound.amount || 0).toFixed(2)}</th>
+                            </tr>
+                        `;
+                        itemsTableBody.innerHTML += footerRow;
+
+                        dashboardBox.style.display = "block";
+                    } else {
+                        resultBox.className = "msg-error";
+                        resultBox.innerHTML = "❌ No invoice record matches this ID in the database.";
+                        dashboardBox.style.display = "none";
+                    }
+                } else {
+                    resultBox.className = "msg-error";
+                    resultBox.innerHTML = "❌ No invoices records found in the database system logs.";
+                    dashboardBox.style.display = "none";
+                }
+            } catch (err) {
+                console.error("Error communicating with Database: ", err);
+                resultBox.className = "msg-error";
+                resultBox.innerHTML = "⚠️ System interface connection error.";
+                dashboardBox.style.display = "none";
+            }
+        }
+
+        // Event Attachment Handles
+        document.getElementById("trackBtn").addEventListener("click", performInvoiceLookup);
+        document.getElementById("invoiceInput").addEventListener("keypress", (e) => {
+            if (e.key === "Enter") performInvoiceLookup();
+        });
+    </script>
 </body>
 </html>
