@@ -3,8 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retail Billing System</title>
-    <link rel="stylesheet" href="retail_billing.css">
+    <title>Retail Billing Invoice</title>
+    <style>
+        /* Modern Premium Dark/Neon Theme Engine */
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(circle at top left, #2c3e50, #1a252f);
+            color: #f8f9fa;
+            margin: 0;
+            padding: 30px 15px;
+            min-height: 100vh;
+        }
+
+        .billing-container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 35px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Responsive Form Layout Grid */
+        .invoice-header-fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #cbd5e1;
+        }
+
+        /* Universal Custom Input Stylings */
+        input[type="text"], 
+        input[type="number"], 
+        select {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            padding: 12px 14px;
+            font-size: 14px;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.25s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus, 
+        input[type="number"]:focus, 
+        select:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        input[readonly] {
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: #94a3b8 !important;
+            border-color: rgba(255, 255, 255, 0.05) !important;
+            cursor: not-allowed;
+        }
+
+        /* Tabular Item Matrix Layout */
+        .items-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(15, 23, 42, 0.3);
+            min-width: 700px;
+        }
+
+        .items-table th {
+            background: rgba(15, 23, 42, 0.8);
+            color: #38bdf8;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .items-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .items-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Grand Summary Panel alignment */
+        .total-summary-section {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 15px;
+            margin-top: 25px;
+            padding: 15px 5px;
+        }
+
+        .total-summary-section label {
+            font-size: 16px;
+            font-weight: 700;
+            color: #38bdf8;
+        }
+
+        .total-summary-section input {
+            max-width: 200px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #22c55e;
+            text-align: right;
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        /* Database Status Alert Message Block */
+        #dbStatusMessage {
+            display: none;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 25px auto 5px auto;
+            max-width: 550px;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Dynamic action button structures */
+        .action-buttons-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto 10px auto;
+            max-width: 550px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px 24px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.5px;
+        }
+
+        #submitBillBtn {
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3);
+        }
+
+        #submitBillBtn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+            filter: brightness(1.1);
+        }
+
+        #printBillBtn {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3);
+        }
+
+        #printBillBtn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+            filter: brightness(1.1);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(1px) !important;
+        }
+
+        /* Locked/Disabled System state styling */
+        button:disabled {
+            background: #475569 !important;
+            color: #94a3b8 !important;
+            cursor: not-allowed;
+            opacity: 0.4;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Complete page-break configuration rules for printing actions */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0;
+            }
+            .billing-container {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0;
+                backdrop-filter: none !important;
+            }
+            h2 {
+                color: #000000 !important;
+                border-bottom: 2px solid #000000 !important;
+            }
+            .form-group label { color: #444444 !important; }
+            input[type="text"], input[type="number"], select {
+                background: transparent !important;
+                border: 1px solid #777777 !important;
+                color: #000000 !important;
+            }
+            .items-table th {
+                background: #eeeeee !important;
+                color: #000000 !important;
+                border-bottom: 2px solid #000000 !important;
+            }
+            .items-table td { border-bottom: 1px solid #dddddd !important; }
+            .total-summary-section input { color: #000000 !important; border-color: #000 !important; }
+            .action-buttons-container, #dbStatusMessage {
+                display: none !important;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -12,66 +276,82 @@
         <h2>Retail Billing Invoice</h2>
 
         <div class="invoice-header-fields">
-            <label>Invoice ID:</label>
-            <input type="text" id="invoiceIdInput" value="INV-157190">
+            <div class="form-group">
+                <label>Invoice ID (System)</label>
+                <input type="text" id="invoiceIdInput" value="INV-157190" placeholder="Auto-generated ID">
+            </div>
 
-            <label>Bill Number:</label>
-            <input type="text" id="billNoInput" placeholder="Enter Bill No">
+            <div class="form-group">
+                <label>Bill Number</label>
+                <input type="text" id="billNoInput" placeholder="Enter Bill No">
+            </div>
 
-            <label>Customer Name:</label>
-            <input type="text" id="customerNameInput" placeholder="Walk-In Customer">
+            <div class="form-group">
+                <label>Customer Name</label>
+                <input type="text" id="customerNameInput" placeholder="Walk-In Customer">
+            </div>
 
-            <label>Customer Phone:</label>
-            <input type="text" id="customerPhoneInput" placeholder="N/A">
+            <div class="form-group">
+                <label>Customer Phone No</label>
+                <input type="text" id="customerPhoneInput" placeholder="N/A">
+            </div>
 
-            <label>Payment Method:</label>
-            <select id="paymentMethodSelect">
-                <option value="Cash">Cash</option>
-                <option value="UPI">UPI / Digital</option>
-                <option value="Card">Card</option>
-            </select>
+            <div class="form-group">
+                <label>Payment Method</label>
+                <select id="paymentMethodSelect">
+                    <option value="Cash">Cash</option>
+                    <option value="UPI">UPI / Digital Terminal</option>
+                    <option value="Card">Credit/Debit Card</option>
+                </select>
+            </div>
 
-            <label>Date:</label>
-            <input type="text" id="dateInput" value="30/05/2026">
+            <div class="form-group">
+                <label>Billing Date</label>
+                <input type="text" id="dateInput" value="30/05/2026">
+            </div>
 
-            <label>Time:</label>
-            <input type="text" id="timeInput" value="14:30">
+            <div class="form-group">
+                <label>Billing Time</label>
+                <input type="text" id="timeInput" value="14:30">
+            </div>
         </div>
 
-        <table class="items-table">
-            <thead>
-                <tr>
-                    <th>SKU/Code</th>
-                    <th>Product Description</th>
-                    <th>Quantity</th>
-                    <th>Rate (₹)</th>
-                    <th>Amount (₹)</th>
-                </tr>
-            </thead>
-            <tbody id="itemsTableBody">
-                <tr>
-                    <td><input type="text" placeholder="SKU001"></td>
-                    <td><input type="text" placeholder="Product Name"></td>
-                    <td><input type="number" class="qty-input" value="1"></td>
-                    <td><input type="number" class="rate-input" value="0.00"></td>
-                    <td><input type="number" class="amount-input" value="0.00" readonly></td>
-                </tr>
-                <tr>
-                    <td><input type="text" placeholder="SKU002"></td>
-                    <td><input type="text" placeholder="Product Name"></td>
-                    <td><input type="number" class="qty-input" value="1"></td>
-                    <td><input type="number" class="rate-input" value="0.00"></td>
-                    <td><input type="number" class="amount-input" value="0.00" readonly></td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="items-table-wrapper">
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>SKU / Code</th>
+                        <th>Product Description</th>
+                        <th style="width: 100px;">Quantity</th>
+                        <th style="width: 130px;">Rate (₹)</th>
+                        <th style="width: 150px;">Amount (₹)</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsTableBody">
+                    <tr>
+                        <td><input type="text" placeholder="SKU001"></td>
+                        <td><input type="text" placeholder="Product Name"></td>
+                        <td><input type="number" class="qty-input" value="1" min="1"></td>
+                        <td><input type="number" class="rate-input" value="0.00" step="0.01"></td>
+                        <td><input type="number" class="amount-input" value="0.00" readonly></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" placeholder="SKU002"></td>
+                        <td><input type="text" placeholder="Product Name"></td>
+                        <td><input type="number" class="qty-input" value="1" min="1"></td>
+                        <td><input type="number" class="rate-input" value="0.00" step="0.01"></td>
+                        <td><input type="number" class="amount-input" value="0.00" readonly></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-        <div class="total-summary-section" style="text-align: right; margin-top: 15px;">
-            <label style="font-weight: bold; font-size: 16px;">Grand Total Amount (₹): </label>
+        <div class="total-summary-section">
+            <label>Grand Total Amount:</label>
             <input type="number" id="totalAmountInput" value="0.00" step="0.01">
         </div>
 
-        <div id="dbStatusMessage" style="display: none; text-align: center; font-weight: bold; margin: 15px 0; padding: 10px; border-radius: 4px;"></div>
+        <div id="dbStatusMessage"></div>
 
         <div class="action-buttons-container">
             <button type="button" id="submitBillBtn">Submit Bill</button>
@@ -84,7 +364,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Main database architecture link setup
         const firebaseConfig = {
             apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
             authDomain: "zbillz-f4798.firebaseapp.com",
@@ -98,7 +377,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Dynamic multi-row text data object mapper parser
         function getBillingItems() {
             const items = [];
             const rows = document.querySelectorAll("#itemsTableBody tr"); 
@@ -112,7 +390,6 @@
                     const price = parseFloat(inputs[3].value) || 0;
                     const amount = parseFloat(inputs[4].value) || (qty * price);
 
-                    // Only push row if SKU or product name is explicitly supplied
                     if (sku !== "" || pname !== "") {
                         items.push({
                             sku: sku,
@@ -127,23 +404,20 @@
             return items;
         }
 
-        // Live submit transaction control sequence
         async function handleBillSubmission() {
             const submitBtn = document.getElementById("submitBillBtn");
             const printBtn = document.getElementById("printBillBtn");
             const statusMsg = document.getElementById("dbStatusMessage");
 
-            // 1. Initialize processing loader state properties
             statusMsg.style.display = "block";
-            statusMsg.style.backgroundColor = "#fff3cd";
-            statusMsg.style.color = "#664d03"; 
-            statusMsg.style.border = "1px solid #ffe69c";
-            statusMsg.innerText = "⏳ Pushing transaction statement entry records directly into Firebase database backend logs...";
+            statusMsg.style.backgroundColor = "rgba(234, 179, 8, 0.15)";
+            statusMsg.style.color = "#facc15"; 
+            statusMsg.style.border = "1px solid rgba(234, 179, 8, 0.3)";
+            statusMsg.innerText = "⏳ Syncing transaction record to real-time cloud data logs...";
             
             submitBtn.disabled = true;
             submitBtn.innerText = "Submitting...";
 
-            // 2. Format exact object payload maps
             const targetInvoiceId = document.getElementById("invoiceIdInput").value.trim() || "INV-" + Math.floor(Math.random() * 900000 + 100000);
 
             const payload = {
@@ -159,28 +433,23 @@
             };
 
             try {
-                // 3. Perform write execution query
                 await set(ref(db, "sales/" + targetInvoiceId), payload);
                 
-                // 4. Success handling callback updates - Lock configuration releases safely
-                statusMsg.style.backgroundColor = "#d1e7dd";
-                statusMsg.style.color = "#0f5132";
-                statusMsg.style.border = "1px solid #badbcc";
-                statusMsg.innerText = `🎉 Uploaded to Database Successfully! Invoice Reference: ${targetInvoiceId}`;
+                statusMsg.style.backgroundColor = "rgba(34, 197, 94, 0.15)";
+                statusMsg.style.color = "#4ade80";
+                statusMsg.style.border = "1px solid rgba(34, 197, 94, 0.3)";
+                statusMsg.innerText = `🎉 Invoice data verified and uploaded successfully! Reference: ${targetInvoiceId}`;
                 
-                printBtn.disabled = false; // UNLOCK PRINT BUTTON ROW ENTRY RIGHT NOW 🚀
-                
+                printBtn.disabled = false; // Safely unlocks print workflow!
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Submit Bill";
 
             } catch (error) {
-                console.error("Firebase operational crash log channel context:", error);
-                
-                // 5. Connection drop error fallback loops
-                statusMsg.style.backgroundColor = "#f8d7da";
-                statusMsg.style.color = "#842029";
-                statusMsg.style.border = "1px solid #f5c2c7";
-                statusMsg.innerText = "❌ Database transmission pipeline failed! Please check cloud network rules config parameter profiles.";
+                console.error(error);
+                statusMsg.style.backgroundColor = "rgba(239, 68, 68, 0.15)";
+                statusMsg.style.color = "#f87171";
+                statusMsg.style.border = "1px solid rgba(239, 68, 68, 0.3)";
+                statusMsg.innerText = "❌ Database transmission pipeline failed! Please check your network.";
                 
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Submit Bill";
@@ -188,10 +457,8 @@
             }
         }
 
-        // Initialize element execution bindings 
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("submitBillBtn").addEventListener("click", handleBillSubmission);
-            
             document.getElementById("printBillBtn").addEventListener("click", () => {
                 window.print();
             });
