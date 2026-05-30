@@ -9,12 +9,11 @@
 
 .main{
     width:100%;
-    min-height:100vh;
+    height:100vh;
     background-image:url('https://res.cloudinary.com/ddff5thvj/image/upload/v1779987780/bbyh3a5rllxtnuhn3ljv.jpg');
     background-size:cover;
     background-position:center;
     position:relative;
-    padding-bottom:60px;
 }
 
 /* DARK OVERLAY */
@@ -71,6 +70,7 @@
 
 .menu ul li a:hover{
     color:#ff7200;
+
     text-shadow:
     0 0 5px #ff7200,
     0 0 10px #ff7200,
@@ -143,6 +143,7 @@
 
 .btn:hover{
     transform:scale(1.05);
+
     box-shadow:
     0 0 10px #ff7200,
     0 0 20px #ff7200,
@@ -177,6 +178,7 @@
 
 .card:hover{
     transform:translateY(-10px);
+
     box-shadow:
     0 0 10px #ff7200,
     0 0 20px #ff7200,
@@ -195,83 +197,42 @@
     line-height:25px;
 }
 
+
+/* Append these styles directly to the bottom of your style.css file */
+
 /* BIG LIVE COUNT NUMBER */
-
-.live-counter{
-    font-size:38px;
-    font-weight:bold;
-    color:#ffffff;
-    margin:5px 0 10px 0;
-    text-shadow:0 0 10px rgba(255,255,255,0.3);
+.live-counter {
+    font-size: 38px;
+    font-weight: bold;
+    color: #ffffff;
+    margin: 5px 0 10px 0;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
-/* WIDER RECENT CARD */
-
-.card.recent-card{
-    width:320px;
+/* WIDER STYLE MODIFIER FOR THE RECENT DATA FEED CARD */
+.card.recent-card {
+    width: 320px; /* Slightly wider to comfortably fit strings without wrapping text ugly */
 }
 
-/* RECENT CARD TEXT */
-
-.recent-title{
-    font-size:20px;
-    font-weight:bold;
-    color:#ffffff;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    margin-bottom:8px;
+/* HIGH-CONTRAST DYNAMIC TEXT */
+.recent-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Shortens abnormally long product names cleanly with three dots (...) */
+    margin-bottom: 8px;
 }
 
-.recent-meta{
-    font-size:14px;
-    color:#bbb;
-    margin-top:4px;
+.recent-meta {
+    font-size: 14px;
+    color: #bbb;
+    margin-top: 4px;
 }
 
-.recent-meta span{
-    color:#ff7200;
-    font-weight:bold;
+.recent-meta span {
+    color: #ff7200; /* Accents the SKU name and product count text with your custom neon brand orange */
+    font-weight: bold;
 }
 
-/* SALES GRAPH CONTAINER */
-
-.graph-box{
-    position:relative;
-    z-index:2;
-    margin:30px 80px 0 80px;
-    padding:25px 30px;
-    background:rgba(0,0,0,0.55);
-    border-radius:20px;
-    border:1px solid rgba(255,255,255,0.1);
-    backdrop-filter:blur(8px);
-}
-
-.graph-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:18px;
-}
-
-.graph-header h3{
-    color:#ff7200;
-    font-size:16px;
-    font-weight:bold;
-    margin-bottom:4px;
-}
-
-.graph-header p{
-    color:#888;
-    font-size:12px;
-}
-
-.graph-today-badge{
-    background:rgba(255,114,0,0.15);
-    border:1px solid #ff7200;
-    border-radius:8px;
-    padding:6px 14px;
-    color:#ff7200;
-    font-size:13px;
-    font-weight:bold;
-}
