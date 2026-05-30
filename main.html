@@ -2,9 +2,11 @@
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Zbilz - Stock Management</title>
+    <title>Zbilz - Sales Analytics Dashboard</title>
+
     <script src="auth-guard.js"></script>
     <link rel="stylesheet" href="style.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -13,6 +15,7 @@
             <div class="icon">
                 <h2 class="logo">Zbilz</h2>
             </div>
+
             <div class="menu">
                 <ul>
                     <li><a href="index.html">HOME</a></li>
@@ -25,40 +28,31 @@
         </div>
 
         <div class="content">
-            <h1>Stock <span>Management</span></h1>
-            <p>Monitor warehouse metrics, observe system assets, and process customer ledger tracks instantly from a centralized dashboard matrix.</p>
-            <button class="btn" onclick="location.href='warehouse.html'">Manage Stock</button>
+            <h1>Sales <span>Performance</span></h1>
+            <p>Track business health, analyze pricing trends, and review absolute billing matrices dynamically from an interactive analytical display dashboard.</p>
         </div>
 
         <div class="cards">
             <div class="card">
-                <h2>Total Stock</h2>
-                <div class="live-counter" id="totalStock">0</div>
-                <p>Physical products in system</p>
+                <h2>Total Revenue</h2>
+                <div class="live-counter" id="totalRevenue">$0.00</div>
+                <p>Accumulated processing sales volume</p>
             </div>
 
             <div class="card recent-card">
-                <h2>Recent Inbound</h2>
+                <h2>Recent Order</h2>
                 <div id="recentItemBox">
-                    <div class="recent-title" id="recentItemName">Loading...</div>
-                    <div class="recent-meta">SKU: <span id="recentSku">--</span></div>
-                    <div class="recent-meta">Qty: <span id="recentQty">--</span> pcs</div>
+                    <div class="recent-title" id="recentBillId">Loading...</div>
+                    <div class="recent-meta">Amount: <span id="recentAmount">--</span></div>
+                    <div class="recent-meta">Status: <span id="recentStatus" style="color: #ff7c00;">--</span></div>
                 </div>
             </div>
         </div>
 
-        <!-- SALES GRAPH -->
-        <div class="graph-box">
-            <div class="graph-header">
-                <div>
-                    <h3>DAILY SALES ACTIVITY</h3>
-                    <p>Revenue movement — today vs previous days</p>
-                </div>
-                <div id="todaySalesTag" class="graph-today-badge">Today: $0.00</div>
-            </div>
-            <canvas id="mainSalesChart" height="100"></canvas>
+        <div class="chart-container" style="position: relative; margin: 40px auto; padding: 20px; width: 90%; max-width: 800px; background: rgba(30,30,30,0.7); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+            <h3 style="color: #fff; margin-bottom: 15px; font-weight: 500;">Sales Price Action & Volume</h3>
+            <canvas id="salesChart"></canvas>
         </div>
-
     </div>
 
     <script>
@@ -79,90 +73,90 @@
             projectId: "zbillz-f4798",
             storageBucket: "zbillz-f4798.firebasestorage.app",
             messagingSenderId: "495466751324",
-            appId: "1:495466751324:web:324e3440f13fad0acdcd99"
+            appId: "1:495466751324:web:324e3440f13fad0acdcd99",
+            measurementId: "G-8SZG4XLT9P"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // --- Inventory Cards ---
-        onValue(ref(db, 'inventory'), (snapshot) => {
-            if (!snapshot.exists()) return;
-            const data = snapshot.val();
-            let totalQty = 0;
-            const records = Object.entries(data);
+        // Elements
+        const totalRevenueBox = document.getElementById('totalRevenue');
+        const recentBillIdBox = document.getElementById('recentBillId');
+        const recentAmountBox = document.getElementById('recentAmount');
+        const recentStatusBox = document.getElementById('recentStatus');
 
-            records.forEach(([key, item]) => {
-                totalQty += Number(item.quantity || item.qty || 0);
-            });
-
-            document.getElementById('totalStock').innerText = totalQty;
-
-            const [lastKey, lastItem] = records[records.length - 1];
-            document.getElementById('recentItemName').innerText = lastItem.name || lastItem.itemName || 'Unknown';
-            document.getElementById('recentSku').innerText = lastItem.sku || lastKey.substring(0, 8);
-            document.getElementById('recentQty').innerText = lastItem.quantity || lastItem.qty || 0;
-        });
-
-        // --- Sales Chart ---
-        const ctx = document.getElementById('mainSalesChart').getContext('2d');
-        const mainChart = new Chart(ctx, {
+        // Initialize Chart.js Graphic Instance
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        const salesChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: [],
+                labels: [], // Populated dynamically via billing database timestamps
                 datasets: [{
-                    label: 'Sales ($)',
-                    data: [],
-                    borderColor: '#ff7200',
-                    backgroundColor: 'rgba(255,114,0,0.08)',
+                    label: 'Revenue Action ($)',
+                    data: [], // Populated dynamically from bill amounts
+                    borderColor: '#ff7c00',
+                    backgroundColor: 'rgba(255, 124, 0, 0.1)',
                     borderWidth: 2,
-                    pointBackgroundColor: '#ff7200',
-                    pointRadius: 4,
-                    tension: 0.4,
+                    tension: 0.3,
                     fill: true
                 }]
             },
             options: {
                 responsive: true,
-                plugins: { legend: { display: false } },
+                plugins: {
+                    legend: { labels: { color: '#fff' } }
+                },
                 scales: {
-                    x: {
-                        grid: { color: 'rgba(255,255,255,0.04)' },
-                        ticks: { color: '#888', font: { size: 11 } }
-                    },
-                    y: {
-                        grid: { color: 'rgba(255,255,255,0.04)' },
-                        ticks: { color: '#888', font: { size: 11 }, callback: v => '$' + v }
-                    }
+                    x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#aaa' } },
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#aaa' } }
                 }
             }
         });
 
-        // --- Sales Data from Billing ---
-        onValue(ref(db, 'billing'), (snapshot) => {
-            if (!snapshot.exists()) return;
-            const data = snapshot.val();
+        // Event Listener targeting the Billing endpoint nodes
+        const billingRef = ref(db, 'billing');
+        onValue(billingRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                let absoluteRevenue = 0;
+                
+                let chartLabels = [];
+                let chartDataPoints = [];
 
-            // Group sales totals by date
-            const byDate = {};
-            Object.values(data).forEach(invoice => {
-                const date = invoice.date || 'Unknown';
-                const amount = Number(invoice.total || invoice.amount || 0);
-                byDate[date] = (byDate[date] || 0) + amount;
-            });
+                const records = Object.entries(data);
+                
+                records.forEach(([key, invoice]) => {
+                    // Change item total depending on how your billing node writes property fields (e.g., total, amount, grandTotal)
+                    const billAmount = Number(invoice.total || invoice.amount || 0);
+                    absoluteRevenue += billAmount;
 
-            // Sort oldest to newest
-            const sorted = Object.entries(byDate).sort((a, b) => new Date(a[0]) - new Date(b[0]));
-            const labels = sorted.map(e => e[0]);
-            const values = sorted.map(e => e[1]);
+                    // Prepare graphics structural tracking matrix
+                    const rawDate = invoice.date || 'Record';
+                    chartLabels.push(rawDate);
+                    chartDataPoints.push(billAmount);
+                });
 
-            // Update today badge
-            const todayTotal = values[values.length - 1] || 0;
-            document.getElementById('todaySalesTag').textContent = `Today: $${todayTotal.toFixed(2)}`;
+                // Render metrics summaries out to cards
+                totalRevenueBox.innerText = `$${absoluteRevenue.toFixed(2)}`;
 
-            mainChart.data.labels = labels;
-            mainChart.data.datasets[0].data = values;
-            mainChart.update();
+                // Update metrics targeting the final node array values
+                const [lastId, lastInvoice] = records[records.length - 1];
+                recentBillIdBox.innerText = `Invoice ID: ${lastId.substring(0, 8)}`;
+                recentAmountBox.innerText = `$${Number(lastInvoice.total || lastInvoice.amount || 0).toFixed(2)}`;
+                recentStatusBox.innerText = lastInvoice.status || "Paid";
+
+                // Refresh Graphic Object Datasets
+                salesChart.data.labels = chartLabels;
+                salesChart.data.datasets[0].data = chartDataPoints;
+                salesChart.update();
+
+            } else {
+                totalRevenueBox.innerText = "$0.00";
+                recentBillIdBox.innerText = "No Bills Evaluated";
+                recentAmountBox.innerText = "--";
+                recentStatusBox.innerText = "--";
+            }
         });
     </script>
 </body>
