@@ -111,22 +111,33 @@ h1{
     0 0 20px #ff7200,
     0 0 35px #ff7200;
 }
+/* NEW CONTAINER TO CENTER THE BUTTON BELOW THE CARDS */
+.footer-container {
+    width: 100%;
+    text-align: center;
+    margin-top: 50px; /* Gives it breathing room below the cards */
+    display: block;
+}
+
+/* YOUR CUSTOMIZED RETURN BUTTON */
 .setup-return-btn {
     background: #1a1a1a;
     color: white;
-    border: 1px solid rgba(255,255,255,0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Slightly increased opacity to see the edge */
     border-radius: 10px;
     padding: 14px 45px;
     font-size: 15px;
     font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
     text-decoration: none;
     display: inline-block;
+    transition: 0.4s; /* Matches your card transitions */
     box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
 
+/* RETURN BUTTON HOVER (Now with a subtle theme glow!) */
 .setup-return-btn:hover {
     background: #252525;
-    transform: scale(1.02);
+    transform: translateY(-3px); /* Subtle lift instead of scale */
+    border-color: #ff7200;       /* Turns orange on hover */
+    box-shadow: 0 0 15px rgba(255, 114, 0, 0.4); /* Subtle orange glow */
 }
