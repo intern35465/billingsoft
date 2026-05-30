@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice Tracking Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* ==========================================================================
-           1. DASHBOARD MATCHING INTERFACE STYLE (ON-SCREEN)
-           ========================================================================== */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f4f6f9;
@@ -17,7 +15,7 @@
         }
 
         .tracking-container {
-            max-width: 750px;
+            max-width: 800px;
             margin: 0 auto;
             background: #ffffff;
             padding: 30px;
@@ -46,7 +44,7 @@
         .search-box {
             display: flex;
             gap: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         input[type="text"] {
@@ -79,11 +77,10 @@
             background: #0b5ed7;
         }
 
-        /* Alerts and Messaging Channels */
         #result {
             font-size: 14px;
             font-weight: 600;
-            margin: 10px 0;
+            margin: 10px 0 20px 0;
             padding: 10px;
             border-radius: 4px;
             display: none;
@@ -91,7 +88,17 @@
         .msg-success { background: #d1e7dd; color: #0f5132; display: block !important; }
         .msg-error { background: #f8d7da; color: #842029; display: block !important; }
 
-        /* Dynamic Structured Overview Layout Lists */
+        /* LIVE CHART CONTAINER PANEL */
+        .chart-box {
+            background: #f8f9fa;
+            border: 1px solid #eaeaea;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-sizing: border-box;
+        }
+
+        /* Dynamic Structured Summary Cards */
         .meta-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -121,7 +128,6 @@
             color: #212529;
         }
 
-        /* Status UI Component Badges */
         .badge {
             display: inline-block;
             padding: 4px 8px;
@@ -133,7 +139,7 @@
         }
         .badge-paid { background-color: #d1e7dd; color: #0f5132; }
 
-        /* Transactional Details Ledger Matrix Table */
+        /* Transaction Details Table Matrix */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -181,6 +187,15 @@
 
         <div id="result"></div>
 
+        <div class="chart-box">
+            <h4 style="margin: 0 0 15px 0; font-size: 14px; color: #495057; text-transform: uppercase; letter-spacing: 0.5px;">
+                📈 Live Revenue Metrics (Recent Sales Streams)
+            </h4>
+            <div style="position: relative; width: 100%; height: 260px;">
+                <canvas id="salesAnalyticsChart"></canvas>
+            </div>
+        </div>
+
         <div id="dashboard" style="display: none;">
             
             <h3>Invoice Overview</h3>
@@ -222,8 +237,7 @@
                         <th style="text-align: right;">Line Subtotal</th>
                     </tr>
                 </thead>
-                <tbody id="itemsTableBody">
-                    </tbody>
+                <tbody id="itemsTableBody"></tbody>
             </table>
         </div>
     </div>
@@ -232,7 +246,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Your exact matching database configuration credentials
         const firebaseConfig = {
             apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
             authDomain: "zbillz-f4798.firebaseapp.com",
@@ -245,6 +258,78 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        let liveChartInstance = null;
+
+        // GENERATE AND SYNC CHART INTERFACE WITH LIVE FIREBASE REALTIME STREAMS
+        async function buildLiveSalesChart() {
+            const ctx = document.getElementById('salesAnalyticsChart').getContext('2d');
+            
+            try {
+                const snapshot = await get(ref(db, "sales"));
+                let chartLabels = [];
+                let chartDataValues = [];
+
+                if (snapshot.exists()) {
+                    const salesData = snapshot.val();
+                    
+                    // Pull last 7 sales record sequences out of database maps
+                    const recordKeys = Object.keys(salesData).slice(-7); 
+                    
+                    recordKeys.forEach(key => {
+                        const invoice = salesData[key];
+                        // Tag chart labels with invoice references cleanly
+                        const labelId = invoice.invoiceId || invoice.billNo || key;
+                        const totalAmt = parseFloat(invoice.totalAmount || invoice.amount || 0);
+                        
+                        chartLabels.push(labelId);
+                        chartDataValues.push(totalAmt);
+                    });
+                } else {
+                    // Fallback visual mockups showing zero values if datastore contains empty structures
+                    chartLabels = ["No Data 1", "No Data 2", "No Data 3"];
+                    chartDataValues = [0, 0, 0];
+                }
+
+                // Destroy old instance if re-rendered to avoid canvas memory leaking crashes
+                if(liveChartInstance) { liveChartInstance.destroy(); }
+
+                liveChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            label: 'Invoice Collection (INR ₹)',
+                            data: chartDataValues,
+                            backgroundColor: 'rgba(13, 110, 253, 0.75)',
+                            borderColor: '#0d6efd',
+                            borderWidth: 1.5,
+                            borderRadius: 4,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: '#eaeaea' },
+                                ticks: { font: { family: 'Segoe UI' } }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { font: { family: 'Segoe UI', size: 11, weight: '600' } }
+                            }
+                        }
+                    }
+                });
+
+            } catch (err) {
+                console.error("Chart generation pipeline break: ", err);
+            }
+        }
 
         async function performInvoiceLookup() {
             const searchKey = document.getElementById("invoiceInput").value.trim();
@@ -259,17 +344,14 @@
             }
 
             try {
-                // Read directly from your 'sales' reference table
                 const snapshot = await get(ref(db, "sales"));
                 if (snapshot.exists()) {
                     const salesData = snapshot.val();
                     let recordFound = null;
                     let foundKeyId = searchKey;
 
-                    // DEEP MATCH LOOP: Scans main node IDs, inner invoiceId, and inner billNo properties
                     for (let key in salesData) {
                         const currentRecord = salesData[key];
-                        
                         if (key.toLowerCase() === searchKey.toLowerCase() ||
                             (currentRecord.invoiceId && String(currentRecord.invoiceId).toLowerCase() === searchKey.toLowerCase()) ||
                             (currentRecord.billNo && String(currentRecord.billNo).toLowerCase() === searchKey.toLowerCase())) {
@@ -284,7 +366,6 @@
                         resultBox.className = "msg-success";
                         resultBox.innerHTML = "✔️ Invoice Record Located Successfully.";
                         
-                        // Populate Overview Grid Information dynamically with safe fallbacks
                         document.getElementById("invoiceId").innerText = recordFound.invoiceId || recordFound.billNo || foundKeyId;
                         document.getElementById("custName").innerText = recordFound.custName || recordFound.customerName || "Walk-In Customer";
                         document.getElementById("custPhone").innerText = recordFound.custPhone || recordFound.customerPhone || "N/A";
@@ -294,9 +375,8 @@
                         const timeVal = recordFound.time || recordFound.billTime || "";
                         document.getElementById("billDateTime").innerText = (dateVal || timeVal) ? `${dateVal} ${timeVal}` : "N/A";
 
-                        // Build individual product item lines cleanly
                         const itemsTableBody = document.getElementById("itemsTableBody");
-                        itemsTableBody.innerHTML = ""; // Clear out older tables
+                        itemsTableBody.innerHTML = ""; 
 
                         let itemsArray = [];
                         if (recordFound.items) {
@@ -323,10 +403,9 @@
                                 }
                             });
                         } else {
-                            itemsTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#666;">No item details saved inside this transaction node.</td></tr>`;
+                            itemsTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#666;">No item details saved.</td></tr>`;
                         }
 
-                        // Display Grand Total Sum Summary Block 
                         const grandTotal = recordFound.totalAmount || recordFound.priceBox || recordFound.amount || 0;
                         const footerRow = `
                             <tr class="grand-total-row">
@@ -335,7 +414,6 @@
                             </tr>
                         `;
                         itemsTableBody.innerHTML += footerRow;
-
                         dashboardBox.style.display = "block";
                     } else {
                         resultBox.className = "msg-error";
@@ -344,22 +422,24 @@
                     }
                 } else {
                     resultBox.className = "msg-error";
-                    resultBox.innerHTML = "❌ Critical Error: The 'sales' table node is empty in your Firebase database.";
+                    resultBox.innerHTML = "❌ Critical Error: The 'sales' node is empty in your Firebase database.";
                     dashboardBox.style.display = "none";
                 }
             } catch (err) {
-                console.error("Lookup Operations Error: ", err);
+                console.error(err);
                 resultBox.className = "msg-error";
-                resultBox.innerHTML = "⚠️ System interface connection error while querying database.";
+                resultBox.innerHTML = "⚠️ System interface connection error.";
                 dashboardBox.style.display = "none";
             }
         }
 
-        // Attach Application UI Event Click/Enter Triggers
         document.getElementById("trackBtn").addEventListener("click", performInvoiceLookup);
         document.getElementById("invoiceInput").addEventListener("keypress", (e) => {
             if (e.key === "Enter") performInvoiceLookup();
         });
+
+        // Load the live chart immediately on layout load execution
+        buildLiveSalesChart();
     </script>
 </body>
 </html>
