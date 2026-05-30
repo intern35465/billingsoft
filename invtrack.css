@@ -1,0 +1,101 @@
+body{
+    background:#3f3f3f;
+    color:white;
+    font-family:Arial,sans-serif;
+}
+
+.tracking-container{
+    background:rgba(0,0,0,0.35);
+    backdrop-filter:blur(10px);
+    border-radius:15px;
+    padding:30px;
+    color:white;
+}
+
+h2,h3{
+    color:#ff7200;
+}
+
+h3{
+    border-left:4px solid #ff7200;
+    padding-left:10px;
+}
+
+input[type="text"]{
+    background:#222;
+    color:white;
+    border:1px solid #555;
+    border-radius:8px;
+}
+
+input[type="text"]:focus{
+    border-color:#ff7200;
+}
+
+button,
+.action-btn{
+    background:#ff7200;
+    color:white;
+    border:none;
+    border-radius:8px;
+}
+
+button:hover,
+.action-btn:hover{
+    background:#e56700;
+}
+
+.main-table{
+    background:#111;
+    color:white;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.main-table th{
+    background:#ff7200;
+    color:white;
+}
+
+.main-table td{
+    border-bottom:1px solid #333;
+}
+
+.main-table tr:hover{
+    background:#1a1a1a;
+}
+
+.meta-grid{
+    background:#1b1b1b;
+    border-radius:10px;
+}
+
+.meta-item{
+    background:#111;
+    border-left:4px solid #ff7200;
+    padding:12px;
+    border-radius:8px;
+}
+
+.class-label{
+    color:#aaa;
+}
+
+.class-value{
+    color:white;
+}
+
+.badge-paid{
+    background:#ff7200;
+    color:white;
+}
+
+.msg-success{
+    background:#1f3a1f;
+    color:#7cff7c;
+}
+
+.msg-error{
+    background:#3d1a1a;
+    color:#ff8a8a;
+}
