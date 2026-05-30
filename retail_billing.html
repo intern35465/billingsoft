@@ -1,1 +1,267 @@
-hi
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BILLING TERMINAL</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        input, select { padding: 5px; margin: 5px; }
+        table { border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2><b>STORE NAME</b></h2>
+        <p>Location: PALAKKAD | Ph No:</p>
+        <hr>
+
+        <form id="billingForm">
+            <label>Bill No:</label>
+            <input type="text" id="billNo" readonly>
+            <br><br>
+
+            <label>Time:</label>
+            <input type="time" id="billTime" readonly>
+            &nbsp;&nbsp;&nbsp;
+            <label>Date:</label>
+            <input type="date" id="billDate" readonly>
+            <br><br>
+
+            <label>Customer Type:</label>
+            <select id="customerTypeSelector">
+                <option value="retail">Regular Retail Customer</option>
+                <option value="wholesale">Wholesale Vendor</option>
+            </select>
+            <br><br>
+
+            <div id="vendorDropdownArea" style="display: none;">
+                <label>Select Saved Vendor:</label>
+                <select id="vendorSelector">
+                    <option value="">-- Select Vendor Profile --</option>
+                </select>
+                <br><br>
+                
+                <label>Contract Discount:</label>
+                <input type="text" id="vendorDiscountBox" readonly>
+                &nbsp;&nbsp;&nbsp;
+                <label>Outstanding Balance:</label>
+                <input type="text" id="vendorBalanceBox" readonly>
+                <br><br>
+            </div>
+
+            <label>Customer Name:</label>
+            <input type="text" id="custName">
+            <br><br>
+
+            <label>Customer Ph No:</label>
+            <input type="number" id="custPhone">
+            <br><br>
+
+            <table border="1">
+                <tr>
+                    <th>SKU</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Rate</th>
+                    <th>Amount</th>
+                </tr>
+                <tr>
+                    <td><input type="text" id="pcode" onkeyup="getProductName()"></td>
+                    <td><input type="text" id="pname" readonly></td>
+                    <td><input type="number" id="qty" min="1" value="1"></td>
+                    <td><input type="number" id="rate" readonly></td>
+                    <td><input type="number" id="amount" readonly></td>
+                </tr>
+            </table>
+
+            <br><br>
+            <button type="button">Add Item</button>
+            <button type="button">Remove</button>
+            <br><br>
+
+            <label>Price (Subtotal):</label>
+            <input type="number" id="priceBox" readonly>
+            <br><br>
+
+            <label>GST No:</label>
+            <input type="text" value="GSTIN-27ABCDE1234F1Z5" readonly>
+            <br><br>
+
+            <label>Tax:</label>
+            <select id="gst">
+                <option value="0">GST 0%</option>
+                <option value="5">GST 5%</option>
+                <option value="12">GST 12%</option>
+                <option value="18">GST 18%</option>
+                <option value="28">GST 28%</option>
+            </select>
+            <br><br>
+
+            <label>Total Amount:</label>
+            <input type="number" id="totalAmount" readonly>
+            <br><br>
+
+            <label>Payment Method:</label>
+            <select>
+                <option>Cash</option>
+                <option>UPI</option>
+                <option>Card</option>
+            </select>
+            <br><br>
+
+            <label>Billing Staff:</label>
+            <input type="text">
+            <br><br><br>
+
+            <b>THANK YOU</b>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC7bl9e1sDibEe4BP1PzWnOhwt_gpL7abo",
+            authDomain: "zbillz-f4798.firebaseapp.com",
+            databaseURL: "https://zbillz-f4798-default-rtdb.firebaseio.com",
+            projectId: "zbillz-f4798",
+            storageBucket: "zbillz-f4798.firebasestorage.app",
+            messagingSenderId: "495466751324",
+            appId: "1:495466751324:web:324e3440f13fad0acdcd99"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let globalVendorsObject = {};
+        let currentVendorDiscount = 0;
+
+        // --- INVOICE TIME/ID TRACKERS ---
+        let billNumber = localStorage.getItem("billNumber") || 1001;
+        let today = new Date();
+        let datePart = today.getFullYear() + String(today.getMonth() + 1).padStart(2, "0") + String(today.getDate()).padStart(2, "0");
+        
+        document.getElementById("billNo").value = "BILL-" + datePart + "-" + billNumber;
+        billNumber++;
+        localStorage.setItem("billNumber", billNumber);
+
+        document.getElementById("billDate").value = new Date().toISOString().split("T")[0];
+        let now = new Date();
+        document.getElementById("billTime").value = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
+
+        // --- WHOLESALE TOGGLE LISTENER ---
+        const customerTypeSelector = document.getElementById("customerTypeSelector");
+        const vendorDropdownArea = document.getElementById("vendorDropdownArea");
+        const vendorSelector = document.getElementById("vendorSelector");
+
+        customerTypeSelector.addEventListener("change", async () => {
+            if (customerTypeSelector.value === "wholesale") {
+                vendorDropdownArea.style.display = "block";
+                await fetchWholesaleVendors();
+            } else {
+                vendorDropdownArea.style.display = "none";
+                currentVendorDiscount = 0;
+                document.getElementById("custName").value = "";
+                document.getElementById("custPhone").value = "";
+                calculateAmount();
+            }
+        });
+
+        async function fetchWholesaleVendors() {
+            try {
+                const snapshot = await get(ref(db, "wholesale_vendors"));
+                vendorSelector.innerHTML = '<option value="">-- Select Vendor Profile --</option>';
+                
+                if (snapshot.exists()) {
+                    globalVendorsObject = snapshot.val();
+                    for (let key in globalVendorsObject) {
+                        const vendor = globalVendorsObject[key];
+                        const companyName = vendor.companyName || vendor.vendorName || key;
+                        vendorSelector.innerHTML += `<option value="${key}">${companyName}</option>`;
+                    }
+                } else {
+                    vendorSelector.innerHTML = '<option value="">No vendors found in DB</option>';
+                }
+            } catch (err) {
+                console.error("Error reading vendor directory node:", err);
+            }
+        }
+
+        vendorSelector.addEventListener("change", () => {
+            const selectedKey = vendorSelector.value;
+            if (selectedKey && globalVendorsObject[selectedKey]) {
+                const vendorData = globalVendorsObject[selectedKey];
+
+                document.getElementById("custName").value = vendorData.companyName || vendorData.vendorName || selectedKey;
+                document.getElementById("custPhone").value = vendorData.phone || vendorData.contact || "";
+                
+                currentVendorDiscount = Number(vendorData.discount) || Number(vendorData.discountRate) || 0;
+                const outstandingBalance = vendorData.balance || vendorData.outstanding || 0;
+
+                document.getElementById("vendorDiscountBox").value = currentVendorDiscount + " %";
+                document.getElementById("vendorBalanceBox").value = "Rs. " + Number(outstandingBalance).toFixed(2);
+                
+                calculateAmount();
+            } else {
+                currentVendorDiscount = 0;
+                document.getElementById("vendorDiscountBox").value = "";
+                document.getElementById("vendorBalanceBox").value = "";
+                calculateAmount();
+            }
+        });
+
+        // --- LIVE INVENTORY RETRIEVAL ---
+        window.getProductName = async function () {
+            const sku = document.getElementById("pcode").value.trim();
+            if (!sku) return;
+
+            const snapshot = await get(ref(db, "inventory"));
+
+            if (snapshot.exists()) {
+                const products = snapshot.val();
+
+                for (let key in products) {
+                    if (String(products[key].sku) === String(sku)) {
+                        document.getElementById("pname").value = products[key].productName;
+                        document.getElementById("rate").value = products[key].price;
+                        document.getElementById("priceBox").value = products[key].price;
+
+                        calculateAmount();
+                        return;
+                    }
+                }
+            }
+            document.getElementById("pname").value = "";
+            document.getElementById("rate").value = "";
+            document.getElementById("priceBox").value = "";
+            document.getElementById("amount").value = "";
+            document.getElementById("totalAmount").value = "";
+        };
+
+        // --- MATH RULES MATRIX WITH DISCOUNTS ---
+        function calculateAmount() {
+            let qty = Number(document.getElementById("qty").value) || 0;
+            let rate = Number(document.getElementById("rate").value) || 0;
+            let gstPercent = Number(document.getElementById("gst").value) || 0;
+
+            let grossSubtotal = qty * rate;
+            let discountDeduction = (grossSubtotal * currentVendorDiscount) / 100;
+            let netSubtotal = grossSubtotal - discountDeduction;
+
+            let gstAmount = (netSubtotal * gstPercent) / 100;
+            let finalInvoiceTotal = netSubtotal + gstAmount;
+
+            document.getElementById("priceBox").value = grossSubtotal.toFixed(2);
+            document.getElementById("amount").value = finalInvoiceTotal.toFixed(2);
+            document.getElementById("totalAmount").value = finalInvoiceTotal.toFixed(2);
+        }
+
+        document.getElementById("qty").addEventListener("input", calculateAmount);
+        document.getElementById("gst").addEventListener("change", calculateAmount);
+    </script>
+</body>
+</html>
