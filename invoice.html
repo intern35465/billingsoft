@@ -1,171 +1,271 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Invoice Tracking Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Tracking Dashboard</title>
+    <style>
+        /* Modern Dashboard System Aesthetics */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 40px 20px;
+        }
 
-<style>
-body{
-    font-family: Arial, sans-serif;
-    background: #f2f2f2;
-    padding: 30px;
-}
+        .tracking-container {
+            max-width: 750px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
 
-.box{
-    width: 700px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px #999;
-}
+        h2 {
+            margin-top: 0;
+            font-size: 22px;
+            color: #111;
+            letter-spacing: 0.5px;
+        }
 
-input{
-    width: 95%;
-    padding: 10px;
-    margin: 10px 0;
-}
+        h3 {
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #495057;
+            margin: 30px 0 15px 0;
+            border-left: 3px solid #0d6efd;
+            padding-left: 8px;
+        }
 
-button{
-    padding: 10px 20px;
-    background: blue;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
+        /* Search Layout Bars */
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
 
-table{
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
 
-th, td{
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
-}
+        input[type="text"]:focus {
+            border-color: #86b7fe;
+        }
 
-#dashboard{
-    display: none;
-}
+        button {
+            padding: 12px 28px;
+            background: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
 
-.item-table th{
-    background: #f5f5f5;
-}
-</style>
+        button:hover {
+            background: #0b5ed7;
+        }
+
+        /* Alerts and Messaging Channels */
+        #result {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        .msg-success { background: #d1e7dd; color: #0f5132; display: block !important; }
+        .msg-error { background: #f8d7da; color: #842029; display: block !important; }
+
+        /* Dynamic Structured Overview Layout Lists */
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #eaeaea;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-item span class-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+
+        .meta-item span class-value {
+            font-size: 15px;
+            font-weight: 500;
+            color: #212529;
+        }
+
+        /* Status UI Component Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 4px;
+            text-transform: uppercase;
+            width: fit-content;
+        }
+        .badge-paid { background-color: #d1e7dd; color: #0f5132; }
+        .badge-delivered { background-color: #cff4fc; color: #055160; }
+
+        /* Transactional Details Ledger Matrix Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th {
+            background-color: #212529;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 14px;
+            color: #333;
+        }
+
+        tr:hover td {
+            background-color: #f8f9fa;
+        }
+
+        .grand-total-row th {
+            background-color: #e9ecef;
+            color: #212529;
+            font-size: 15px;
+            padding: 15px 12px;
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="box">
+    <div class="tracking-container">
+        <h2>Invoice Tracking System</h2>
+        
+        <div class="search-box">
+            <input type="text" id="invoice" placeholder="Enter Invoice ID (e.g., INV-123456)">
+            <button onclick="trackInvoice()">Track Invoice</button>
+        </div>
 
-<h2>Invoice Tracking</h2>
+        <div id="result"></div>
 
-<input type="text" id="invoice" placeholder="Enter Invoice ID">
+        <div id="dashboard" style="display: none;">
+            
+            <h3>Invoice Overview</h3>
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <span class="class-label">Invoice ID Reference</span>
+                    <span class="class-value" id="invoiceId" style="font-weight: bold; color: #0d6efd;"></span>
+                </div>
+                <div class="meta-item">
+                    <span class="class-label">Customer Profile Name</span>
+                    <span class="class-value">Vyshnav Saran</span>
+                </div>
+                <div class="meta-item">
+                    <span class="class-label">Settlement Channel</span>
+                    <span class="class-value">UPI Terminal</span>
+                </div>
+                <div class="meta-item">
+                    <span class="class-label">Financial Invoice Status</span>
+                    <span><g class="badge badge-paid">Paid Settlement</g></span>
+                </div>
+                <div class="meta-item">
+                    <span class="class-label">Logistic Delivery Status</span>
+                    <span><g class="badge badge-delivered">Delivered Successfully</g></span>
+                </div>
+            </div>
 
-<button onclick="trackInvoice()">Track</button>
+            <h3>Order Statement Ledger</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item Description</th>
+                        <th>Quantity Order</th>
+                        <th>Unit Valuation Rate</th>
+                        <th style="text-align: right;">Line Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Premium Jeerakasala Rice</td>
+                        <td>2 kg</td>
+                        <td>₹60.00 / kg</td>
+                        <td style="text-align: right; font-weight: 500;">₹120.00</td>
+                    </tr>
+                    <tr>
+                        <td>Fresh Cow Milk Packet</td>
+                        <td>2 Units</td>
+                        <td>₹30.00 / Unit</td>
+                        <td style="text-align: right; font-weight: 500;">₹60.00</td>
+                    </tr>
+                    <tr>
+                        <td>Gourmet Sliced Bread</td>
+                        <td>2 Packets</td>
+                        <td>₹40.00 / Packet</td>
+                        <td style="text-align: right; font-weight: 500;">₹80.00</td>
+                    </tr>
+                    <tr class="grand-total-row">
+                        <th colspan="3" style="text-align: left; font-weight: 700;">Gross Invoice Grand Total Value:</th>
+                        <th style="text-align: right; font-weight: 700; color: #212529; font-size: 16px;">₹260.00</th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-<p id="result"></p>
+    <script>
+        function trackInvoice() {
+            const invoiceInput = document.getElementById("invoice").value.trim();
+            const resultBox = document.getElementById("result");
+            const dashboardBox = document.getElementById("dashboard");
+            const idDisplay = document.getElementById("invoiceId");
 
-<div id="dashboard">
+            // Input Validation Boundary Guard
+            if (invoiceInput === "") {
+                resultBox.className = "msg-error";
+                resultBox.innerHTML = "⚠️ Warning: Please key in a valid Invoice tracking lookup sequence identifier.";
+                dashboardBox.style.display = "none";
+                return;
+            }
 
-<h3>Invoice Dashboard</h3>
-
-<table>
-
-<tr>
-    <th>Invoice ID</th>
-    <td id="invoiceId"></td>
-</tr>
-
-<tr>
-    <th>Customer Name</th>
-    <td>Vyshnav Saran</td>
-</tr>
-
-<tr>
-    <th>Payment Method</th>
-    <td>UPI</td>
-</tr>
-
-<tr>
-    <th>Invoice Status</th>
-    <td>Paid</td>
-</tr>
-
-<tr>
-    <th>Delivery Status</th>
-    <td>Delivered</td>
-</tr>
-
-</table>
-
-<h3>Order Details</h3>
-
-<table class="item-table">
-
-<tr>
-    <th>Item</th>
-    <th>Quantity</th>
-    <th>Rate</th>
-    <th>Total</th>
-</tr>
-
-<tr>
-    <td>Rice</td>
-    <td>2 kg</td>
-    <td>₹60/kg</td>
-    <td>₹120</td>
-</tr>
-
-<tr>
-    <td>Milk</td>
-    <td>2</td>
-    <td>₹30</td>
-    <td>₹60</td>
-</tr>
-
-<tr>
-    <td>Bread</td>
-    <td>2</td>
-    <td>₹40</td>
-    <td>₹80</td>
-</tr>
-
-<tr>
-    <th colspan="3">Grand Total</th>
-    <th>₹260</th>
-</tr>
-
-</table>
-
-</div>
-
-</div>
-
-<script>
-function trackInvoice() {
-
-    let invoice =
-    document.getElementById("invoice").value;
-
-    if(invoice === ""){
-        document.getElementById("result").innerHTML =
-        "Please enter an Invoice ID";
-        return;
-    }
-
-    document.getElementById("invoiceId").innerHTML =
-    invoice;
-
-    document.getElementById("result").innerHTML =
-    "Invoice Found Successfully";
-
-    document.getElementById("dashboard").style.display =
-    "block";
-}
-</script>
+            // Target mapping and interface render responses
+            idDisplay.innerHTML = invoiceInput;
+            resultBox.className = "msg-success";
+            resultBox.innerHTML = "✔️ Success: Database Record Matching Invoice File Located Verified.";
+            dashboardBox.style.display = "block";
+        }
+    </script>
 
 </body>
 </html>
