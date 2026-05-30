@@ -88,14 +88,16 @@
             color: #cbd5e1;
         }
 
+        /* General Input Styling */
         input[type="text"], 
         input[type="number"], 
         select {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #ffffff;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff !important;
             padding: 12px 14px;
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 500;
             border-radius: 8px;
             outline: none;
             transition: all 0.25s ease;
@@ -103,21 +105,24 @@
             box-sizing: border-box;
         }
 
-        input[type="text"]:focus, 
-        input[type="number"]:focus, 
-        select:focus {
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        input:focus, select:focus {
             border-color: #38bdf8;
             box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
-            background: rgba(15, 23, 42, 0.8);
+            background: #0f172a;
         }
 
         input[readonly] {
-            background: rgba(255, 255, 255, 0.05) !important;
+            background: rgba(255, 255, 255, 0.03) !important;
             color: #94a3b8 !important;
             border-color: rgba(255, 255, 255, 0.05) !important;
             cursor: not-allowed;
         }
 
+        /* Table Specific Fixes for Visibility */
         .items-table-wrapper {
             width: 100%;
             overflow-x: auto;
@@ -134,7 +139,7 @@
         }
 
         .items-table th {
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(15, 23, 42, 0.9);
             color: #38bdf8;
             font-size: 12px;
             font-weight: 700;
@@ -145,12 +150,25 @@
         }
 
         .items-table td {
-            padding: 10px 14px;
+            padding: 8px 10px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             vertical-align: middle;
         }
 
-        /* Red Delete Action Cross Styling */
+        /* Force high contrast in table inputs */
+        .items-table input {
+            background: #1e293b !important;
+            color: #ffffff !important;
+            border: 1px solid #475569 !important;
+            font-weight: 600;
+        }
+        
+        .items-table input:focus {
+            background: #0f172a !important;
+            border: 1px solid #38bdf8 !important;
+        }
+
+        /* Action Buttons */
         .btn-delete-row {
             background: #ef4444;
             color: white;
@@ -164,11 +182,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s;
-        }
-
-        .btn-delete-row:hover {
-            background: #dc2626;
         }
 
         .btn-add-row {
@@ -181,11 +194,6 @@
             border-radius: 6px;
             cursor: pointer;
             margin-bottom: 25px;
-            transition: background 0.2s;
-        }
-
-        .btn-add-row:hover {
-            background: #16a34a;
         }
 
         .summary-calculation-block {
@@ -217,83 +225,107 @@
             text-align: right;
         }
 
-        .grand-total-label {
-            font-size: 16px !important;
-            font-weight: 700 !important;
-            color: #38bdf8 !important;
-        }
-
-        .grand-total-input {
-            font-size: 18px !important;
-            font-weight: 700 !important;
-            color: #22c55e !important;
-            border-color: rgba(34, 197, 94, 0.4) !important;
-        }
+        .grand-total-label { font-size: 16px !important; font-weight: 700 !important; color: #38bdf8 !important; }
+        .grand-total-input { font-size: 18px !important; font-weight: 700 !important; color: #22c55e !important; }
 
         #dbStatusMessage {
-            display: none;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 600;
-            margin: 25px auto 5px auto;
-            max-width: 550px;
-            padding: 12px;
-            border-radius: 8px;
+            display: none; text-align: center; font-size: 14px; font-weight: 600;
+            margin: 25px auto 5px auto; max-width: 550px; padding: 12px; border-radius: 8px;
         }
 
         .action-buttons-container {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            align-items: center;
-            margin: 20px auto 10px auto;
-            max-width: 550px;
+            display: flex; gap: 15px; justify-content: center; align-items: center;
+            margin: 20px auto 10px auto; max-width: 550px;
         }
 
         .btn-action {
-            flex: 1;
-            padding: 14px 24px;
-            font-size: 15px;
-            font-weight: 700;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.25s ease;
+            flex: 1; padding: 14px 24px; font-size: 15px; font-weight: 700;
+            border-radius: 8px; border: none; cursor: pointer; transition: all 0.25s ease;
         }
 
-        #submitBillBtn {
-            background: linear-gradient(135deg, #0ea5e9, #0284c7);
-            color: white;
-        }
+        #submitBillBtn { background: linear-gradient(135deg, #0ea5e9, #0284c7); color: white; }
+        #printBillBtn { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
 
-        #submitBillBtn:hover:not(:disabled) {
-            filter: brightness(1.1);
-            transform: translateY(-1px);
-        }
+        button:disabled { background: #475569 !important; color: #94a3b8 !important; cursor: not-allowed; opacity: 0.4; }
 
-        #printBillBtn {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: white;
-        }
-
-        #printBillBtn:hover:not(:disabled) {
-            filter: brightness(1.1);
-            transform: translateY(-1px);
-        }
-
-        button:disabled {
-            background: #475569 !important;
-            color: #94a3b8 !important;
-            cursor: not-allowed;
-            opacity: 0.4;
-            transform: none !important;
-        }
-
+        /* =========================================================
+           PROFESSIONAL PRINT ENGINE - FIXES LAYOUT & INPUT BOXES
+           ========================================================= */
         @media print {
-            body { background: white; color: black; padding: 0; }
-            .billing-container { background: transparent; border: none; box-shadow: none; padding: 0; backdrop-filter: none; }
-            .action-buttons-container, .btn-add-row, .btn-delete-row, #dbStatusMessage, th:last-child, td:last-child { display: none !important; }
-            input, select { border: 1px solid #000 !important; color: #000 !important; background: transparent !important; }
+            @page { margin: 10mm; size: A4 portrait; }
+            
+            body { 
+                background: white !important; 
+                color: black !important; 
+                padding: 0 !important; 
+            }
+            
+            .billing-container { 
+                background: transparent !important; 
+                border: none !important; 
+                box-shadow: none !important; 
+                padding: 0 !important; 
+                max-width: 100% !important;
+            }
+
+            /* Hide all interactive UI elements */
+            .btn-add-row, .btn-delete-row, .action-buttons-container, #dbStatusMessage, th:last-child, td:last-child { 
+                display: none !important; 
+            }
+
+            /* Strip input boxes and make them look like standard typed text */
+            input, select { 
+                border: none !important; 
+                background: transparent !important; 
+                color: black !important; 
+                font-size: 14px !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                -webkit-appearance: none;
+                font-weight: normal !important;
+            }
+            
+            /* Align summary inputs specifically for print */
+            .summary-row input, .summary-row select { text-align: right !important; }
+
+            /* Format Headers for Print */
+            h2 { color: black !important; border-bottom: 2px solid black !important; font-size: 16px !important; margin: 15px 0 10px 0 !important; padding-bottom: 5px !important;}
+            .store-header-box h1 { color: black !important; }
+            .store-header-box p { color: #333 !important; }
+            .form-group label { color: #555 !important; font-size: 10px !important; }
+
+            /* Organize the grid to flow cleanly on A4 paper */
+            .invoice-header-fields, .vendor-profile-panel {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 15px !important;
+                margin-bottom: 15px !important;
+                padding: 0 !important;
+                border: none !important;
+            }
+
+            .form-group { width: 30% !important; flex-grow: 1; }
+
+            /* Create a highly professional Ledger Table */
+            .items-table-wrapper { border: none !important; overflow: visible !important; margin-bottom: 20px !important;}
+            .items-table { border-collapse: collapse !important; border: 1px solid black !important; width: 100% !important; }
+            .items-table th { 
+                background: #f0f0f0 !important; 
+                color: black !important; 
+                border: 1px solid black !important; 
+                padding: 8px !important;
+                font-size: 12px !important;
+            }
+            .items-table td { 
+                border: 1px solid black !important; 
+                padding: 6px 8px !important; 
+            }
+
+            /* Summary Block Clean up */
+            .summary-calculation-block { margin-top: 15px !important; }
+            .summary-row label { color: black !important; font-weight: bold !important; }
+            .grand-total-label, .grand-total-input { color: black !important; font-size: 18px !important; font-weight: bold !important; }
         }
     </style>
 </head>
@@ -313,8 +345,8 @@
                 <input type="text" id="billNoInput" readonly>
             </div>
             <div class="form-group">
-                <label>Invoice ID (System Reference):</label>
-                <input type="text" id="invoiceIdInput" readonly style="color: #38bdf8; font-weight: bold;">
+                <label>Invoice ID (Ref):</label>
+                <input type="text" id="invoiceIdInput" readonly style="color: #38bdf8 !important; font-weight: bold;">
             </div>
             <div class="form-group">
                 <label>Date:</label>
@@ -326,7 +358,7 @@
             </div>
         </div>
 
-        <h2>Customer & Vendor Parameters</h2>
+        <h2>Customer Profile</h2>
         <div class="vendor-profile-panel">
             <div class="form-group">
                 <label>Customer Classification</label>
@@ -336,29 +368,29 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Select Saved Vendor Profile</label>
+                <label>Saved Profile</label>
                 <select id="vendorProfileSelect">
-                    <option value="">-- Select Vendor Profile --</option>
+                    <option value="">-- Select Vendor --</option>
                     <option value="Sye" data-phone="3464655633" data-discount="5">Sye Trading Co.</option>
                     <option value="Albin" data-phone="9446123456" data-discount="10">Albin Distributors</option>
-                    <option value="WalkIn" data-phone="N/A" data-discount="0">Walk-In General Customer</option>
+                    <option value="WalkIn" data-phone="N/A" data-discount="0">Walk-In General</option>
                 </select>
             </div>
             <div class="form-group">
-                <label>Contract Discount (%)</label>
+                <label>Discount (%)</label>
                 <input type="text" id="contractDiscountInput" value="0%" readonly>
             </div>
             <div class="form-group">
                 <label>Customer Name:</label>
-                <input type="text" id="customerNameInput" placeholder="Enter customer name">
+                <input type="text" id="customerNameInput" placeholder="Name">
             </div>
             <div class="form-group">
-                <label>Customer Phone No:</label>
-                <input type="text" id="customerPhoneInput" placeholder="Enter contact number">
+                <label>Customer Phone:</label>
+                <input type="text" id="customerPhoneInput" placeholder="Phone">
             </div>
         </div>
 
-        <h2>Order Ledger Entries</h2>
+        <h2>Order Ledger</h2>
         <div class="items-table-wrapper">
             <table class="items-table">
                 <thead>
@@ -374,7 +406,7 @@
                 <tbody id="itemsTableBody">
                     <tr>
                         <td><input type="text" class="sku-field" placeholder="A111"></td>
-                        <td><input type="text" class="name-field" placeholder="Product Description"></td>
+                        <td><input type="text" class="name-field" placeholder="Description"></td>
                         <td><input type="number" class="qty-field" value="1" min="1"></td>
                         <td><input type="number" class="rate-field" value="0.00" step="0.01"></td>
                         <td><input type="number" class="amount-field" value="0.00" readonly></td>
@@ -392,7 +424,7 @@
                 <input type="number" id="subtotalAmountInput" value="0.00" readonly>
             </div>
             <div class="summary-row">
-                <label>Tax Structure Selector:</label>
+                <label>Tax Structure:</label>
                 <select id="taxBracketSelect">
                     <option value="0">GST 0%</option>
                     <option value="5">GST 5%</option>
@@ -402,15 +434,15 @@
                 </select>
             </div>
             <div class="summary-row">
-                <label class="grand-total-label">Total Invoice Amount:</label>
+                <label class="grand-total-label">Total Amount:</label>
                 <input type="number" id="totalAmountInput" class="grand-total-input" value="0.00" readonly>
             </div>
             <div class="summary-row">
-                <label>Payment Settlement:</label>
+                <label>Payment Method:</label>
                 <select id="paymentMethodSelect">
-                    <option value="Cash">Cash Settlement</option>
-                    <option value="UPI">UPI Terminal / QR Code</option>
-                    <option value="Card">Card Swipe POS</option>
+                    <option value="Cash">Cash</option>
+                    <option value="UPI">UPI</option>
+                    <option value="Card">Card</option>
                 </select>
             </div>
         </div>
@@ -440,30 +472,19 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // ==========================================
-        // AUTO GENERATE CODES & DATETIME STAMPS
-        // ==========================================
         function initInvoiceMetaFields() {
             const now = new Date();
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
             
-            // Format: BILL-YYYYMMDD-XXXX
             const randomSuffix = Math.floor(1000 + Math.random() * 9000);
             document.getElementById("billNoInput").value = `BILL-${year}${month}${day}-${randomSuffix}`;
-            
-            // Format: INV-XXXXXX
             document.getElementById("invoiceIdInput").value = `INV-${Math.floor(100000 + Math.random() * 900000)}`;
-            
-            // Local Dates and Times
             document.getElementById("dateInput").value = `${day}/${month}/${year}`;
             document.getElementById("timeInput").value = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         }
 
-        // ==========================================
-        // VENDOR PROFILE CONTROLLER ATTACHMENTS
-        // ==========================================
         document.getElementById("vendorProfileSelect").addEventListener("change", function() {
             const selectedOption = this.options[this.selectedIndex];
             if (!selectedOption.value) return;
@@ -474,9 +495,6 @@
             calculateTableTotals();
         });
 
-        // ==========================================
-        // CALCULATOR MATRIX MATHEMATICS ENGINE
-        // ==========================================
         function calculateTableTotals() {
             let subtotal = 0;
             const rows = document.querySelectorAll("#itemsTableBody tr");
@@ -491,37 +509,30 @@
                 subtotal += lineTotal;
             });
 
-            // Base Subtotal Box
             document.getElementById("subtotalAmountInput").value = subtotal.toFixed(2);
 
-            // Fetch Vendor Contract Discount Percentage
             const discountPercentage = parseFloat(document.getElementById("contractDiscountInput").value) || 0;
             const discountedSubtotal = subtotal - (subtotal * (discountPercentage / 100));
 
-            // Tax Percentage Modifiers
             const gstRate = parseFloat(document.getElementById("taxBracketSelect").value) || 0;
             const grandTotal = discountedSubtotal + (discountedSubtotal * (gstRate / 100));
 
             document.getElementById("totalAmountInput").value = grandTotal.toFixed(2);
         }
 
-        // ==========================================
-        // DYNAMIC TABLE ROW MUTATION UTILITIES
-        // ==========================================
         function createNewRowElement() {
             const tbody = document.getElementById("itemsTableBody");
             const tr = document.createElement("tr");
 
             tr.innerHTML = `
                 <td><input type="text" class="sku-field" placeholder="SKU Code"></td>
-                <td><input type="text" class="name-field" placeholder="Product Description"></td>
+                <td><input type="text" class="name-field" placeholder="Description"></td>
                 <td><input type="number" class="qty-field" value="1" min="1"></td>
                 <td><input type="number" class="rate-field" value="0.00" step="0.01"></td>
                 <td><input type="number" class="amount-field" value="0.00" readonly></td>
                 <td><button type="button" class="btn-delete-row">X</button></td>
             `;
 
-            // Row Event Hooks
             tr.querySelector(".qty-field").addEventListener("input", calculateTableTotals);
             tr.querySelector(".rate-field").addEventListener("input", calculateTableTotals);
             tr.querySelector(".btn-delete-row").addEventListener("click", function() {
@@ -532,9 +543,6 @@
             tbody.appendChild(tr);
         }
 
-        // ==========================================
-        // OBJECT ARRAY DATA STRUCTURING
-        // ==========================================
         function parseItemsDataToPayload() {
             const items = [];
             const rows = document.querySelectorAll("#itemsTableBody tr");
@@ -547,21 +555,12 @@
                 const amount = parseFloat(row.querySelector(".amount-field").value) || 0;
 
                 if (sku !== "" || pname !== "") {
-                    items.push({
-                        sku: sku,
-                        productName: pname || "General Inventory Item",
-                        quantity: qty,
-                        rate: rate,
-                        amount: amount
-                    });
+                    items.push({ sku: sku, productName: pname || "Item", quantity: qty, rate: rate, amount: amount });
                 }
             });
             return items;
         }
 
-        // ==========================================
-        // FIREBASE LIVE CLOUD TRANSMISSION SEQUENCE
-        // ==========================================
         async function runCloudSubmissionPipeline() {
             const submitBtn = document.getElementById("submitBillBtn");
             const printBtn = document.getElementById("printBillBtn");
@@ -571,7 +570,7 @@
             statusMsg.style.backgroundColor = "rgba(234, 179, 8, 0.15)";
             statusMsg.style.color = "#facc15"; 
             statusMsg.style.border = "1px solid rgba(234, 179, 8, 0.3)";
-            statusMsg.innerText = "⏳ Connecting and syncing transaction payload to real-time database...";
+            statusMsg.innerText = "⏳ Syncing transaction to database...";
             
             submitBtn.disabled = true;
             submitBtn.innerText = "Submitting...";
@@ -581,14 +580,11 @@
             const payload = {
                 invoiceId: invoiceKeyId,
                 billNo: document.getElementById("billNoInput").value.trim(),
-                custName: document.getElementById("customerNameInput").value.trim() || "Walk-In Customer",
+                custName: document.getElementById("customerNameInput").value.trim() || "Walk-In",
                 custPhone: document.getElementById("customerPhoneInput").value.trim() || "N/A",
-                customerClassification: document.getElementById("customerClassificationSelect").value,
                 paymentMethod: document.getElementById("paymentMethodSelect").value,
                 date: document.getElementById("dateInput").value,
                 time: document.getElementById("timeInput").value,
-                subtotal: parseFloat(document.getElementById("subtotalAmountInput").value || 0),
-                taxBracket: document.getElementById("taxBracketSelect").value + "%",
                 totalAmount: parseFloat(document.getElementById("totalAmountInput").value || 0),
                 items: parseItemsDataToPayload()
             };
@@ -599,9 +595,9 @@
                 statusMsg.style.backgroundColor = "rgba(34, 197, 94, 0.15)";
                 statusMsg.style.color = "#4ade80";
                 statusMsg.style.border = "1px solid rgba(34, 197, 94, 0.3)";
-                statusMsg.innerText = `🎉 Uploaded to Database Successfully! Reference Key: ${invoiceKeyId}`;
+                statusMsg.innerText = `🎉 Uploaded Successfully! Ref: ${invoiceKeyId}`;
                 
-                printBtn.disabled = false; // Unlocks the printer block configuration profiles
+                printBtn.disabled = false;
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Submit Bill";
 
@@ -610,7 +606,7 @@
                 statusMsg.style.backgroundColor = "rgba(239, 68, 68, 0.15)";
                 statusMsg.style.color = "#f87171";
                 statusMsg.style.border = "1px solid rgba(239, 68, 68, 0.3)";
-                statusMsg.innerText = "❌ Critical cloud write failure. Please check your data connectivity profiles.";
+                statusMsg.innerText = "❌ Cloud failure. Check connection.";
                 
                 submitBtn.disabled = false;
                 submitBtn.innerText = "Submit Bill";
@@ -618,13 +614,9 @@
             }
         }
 
-        // ==========================================
-        // BOOT & INITIALIZATION HANDLERS
-        // ==========================================
         document.addEventListener("DOMContentLoaded", () => {
             initInvoiceMetaFields();
 
-            // Set base calculation listeners on row 1
             document.querySelector(".qty-field").addEventListener("input", calculateTableTotals);
             document.querySelector(".rate-field").addEventListener("input", calculateTableTotals);
             document.getElementById("taxBracketSelect").addEventListener("change", calculateTableTotals);
@@ -634,12 +626,9 @@
                 calculateTableTotals();
             });
 
-            // Action triggers binding hooks
             document.getElementById("addItemLineBtn").addEventListener("click", createNewRowElement);
             document.getElementById("submitBillBtn").addEventListener("click", runCloudSubmissionPipeline);
-            document.getElementById("printBillBtn").addEventListener("click", () => {
-                window.print();
-            });
+            document.getElementById("printBillBtn").addEventListener("click", () => { window.print(); });
         });
     </script>
 </body>
