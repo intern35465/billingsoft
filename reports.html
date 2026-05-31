@@ -91,6 +91,120 @@
     <div class="footer-container">
         <a href="main.html" class="setup-return-btn">Return to Main Dashboard</a>
     </div>
+// Wait for the DOM to fully load
+document.addEventListener('DOMContentLoaded', () => {
+    
+    const submitBtn = document.querySelector('.submit-btn');
+    const tableBody = document.querySelector('tbody');
+    const fileInput = document.getElementById('invoice-upload');
+    const fileLabelText = document.querySelector('.upload-text');
+
+    // 1. UPDATE UI WHEN A FILE IS SELECTED
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files.length > 0) {
+            // Show the name of the first file uploaded
+            fileLabelText.textContent = `${this.files.length} file(s) selected: ${this.files[0].name}`;
+            fileLabelText.style.color = '#2ecc71'; // Turn green to confirm
+        } else {
+            fileLabelText.textContent = 'Click to Upload Invoice / Folder';
+            fileLabelText.style.color = '#ff7200';
+        }
+    });
+
+    // 2. HANDLE FORM SUBMISSION & DATA CAPTURE
+    submitBtn.addEventListener('click', async (e) => {
+        e.preventDefault(); // Prevent page reload
+
+        // Capture all input elements
+        const vendorNameInput = document.querySelector('input[placeholder="e.g., Britannia Industries"]');
+        const productsInput = document.querySelector('input[placeholder="e.g., 50 Cartons of Biscuits"]');
+        const transactionTypeInput = document.querySelector('select');
+        
+        // Extract values
+        const vendorName = vendorNameInput.value.trim();
+        const products = productsInput.value.trim();
+        const transactionType = transactionTypeInput.value;
+        const files = fileInput.files;
+
+        // Form Validation (Don't let them submit empty data)
+        if (!vendorName || !products) {
+            alert('Please fill in both the Vendor Name and Products Provided.');
+            return;
+        }
+
+        // Generate Current Date for the report
+        const today = new Date().toISOString().split('T')[0];
+
+        // Determine Status Class based on selection
+        const isInbound = transactionType.includes('Inbound');
+        const statusClass = isInbound ? 'inbound' : 'outbound';
+        const statusText = isInbound ? 'Inbound' : 'Outbound';
+
+        // File handling logic (Checks if a file was actually uploaded)
+        let fileHTML = '<span class="no-file">No File</span>';
+        if (files.length > 0) {
+            // In a real app, the href would be the URL returned from your server after uploading
+            fileHTML = `<a href="#" class="view-file-btn">📁 View Invoice</a>`;
+        }
+
+        // 3. DYNAMICALLY INJECT NEW DATA INTO THE TABLE
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td>${today}</td>
+            <td>${vendorName}</td>
+            <td>${products}</td>
+            <td><span class="status ${statusClass}">${statusText}</span></td>
+            <td>${fileHTML}</td>
+        `;
+        
+        // Add the new row to the top of the table
+        tableBody.prepend(newRow);
+
+        // 4. SEND DATA TO YOUR BACKEND (The "Real Software" part)
+        // We use FormData because we are transmitting text AND physical files
+        const formData = new FormData();
+        formData.append('vendorName', vendorName);
+        formData.append('products', products);
+        formData.append('transactionType', statusText);
+        formData.append('date', today);
+        
+        if (files.length > 0) {
+            formData.append('invoiceFile', files[0]); // Attach the actual file
+        }
+
+        try {
+            /* 
+               ===========================================================
+               BACKEND CONNECTION: 
+               Replace '/api/save-report' with your actual server endpoint
+               ===========================================================
+            */
+            // const response = await fetch('/api/save-report', {
+            //     method: 'POST',
+            //     body: formData 
+            // });
+            
+            // if (response.ok) {
+            //     console.log('Successfully saved to database!');
+            // } else {
+            //     console.error('Failed to save to database.');
+            // }
+
+            console.log("Form Data prepared for backend:", Object.fromEntries(formData));
+            
+        } catch (error) {
+            console.error("Network error:", error);
+        }
+
+        // 5. RESET FORM AFTER SUCCESSFUL SUBMISSION
+        vendorNameInput.value = '';
+        productsInput.value = '';
+        transactionTypeInput.selectedIndex = 0;
+        fileInput.value = ''; // Clear file input
+        fileLabelText.textContent = 'Click to Upload Invoice / Folder';
+        fileLabelText.style.color = '#ff7200';
+    });
+});
 
 </body>
 </html>
