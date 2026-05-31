@@ -385,75 +385,81 @@
         <a href="main.html" class="setup-return-btn">Return to Main Dashboard</a>
     </div>
 
-    <!-- JAVASCRIPT: Makes the form work and prepares data for the Database -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            
-            const form = document.getElementById('db-form');
-            const fileInput = document.getElementById('invoice-upload');
-            const fileLabelText = document.querySelector('.upload-text');
-            const tableBody = document.getElementById('report-table-body');
+    <!-- JAVASCRIPT: Makes the form work and prepares data for the Database --><script>
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        const form = document.getElementById('db-form');
+        const fileInput = document.getElementById('invoice-upload');
+        const fileLabelText = document.querySelector('.upload-text');
+        const tableBody = document.getElementById('report-table-body');
 
-            // 1. Show user that a file was successfully selected
-            fileInput.addEventListener('change', function() {
-                if (this.files && this.files.length > 0) {
-                    fileLabelText.textContent = `${this.files.length} file(s) selected: ${this.files[0].name}`;
-                    fileLabelText.style.color = '#2ecc71'; // Turns green
-                } else {
-                    fileLabelText.textContent = 'Click to Upload Invoice / Folder';
-                    fileLabelText.style.color = '#ff7200';
-                }
-            });
-
-            // 2. Handle form submission (The "Real Software" part)
-            form.addEventListener('submit', function(e) {
-                e.preventDefault(); // Stops the page from refreshing
-
-                // Grab the typed values
-                const vendorName = document.getElementById('vendor_name').value.trim();
-                const productName = document.getElementById('product_name').value.trim();
-                const transType = document.getElementById('transaction_type').value;
-                const fileAttached = fileInput.files.length > 0;
-
-                // Format the Date
-                const today = new Date().toISOString().split('T')[0];
-
-                // Set up the CSS class for Inbound vs Outbound
-                const statusClass = transType === 'Inbound' ? 'inbound' : 'outbound';
-
-                // Setup File Button HTML
-                const fileHTML = fileAttached 
-                    ? `<button class="view-file-btn">📁 View Invoice</button>` 
-                    : `<span class="no-file">No File</span>`;
-
-                // 3. Add the new row to the table dynamically
-                const newRow = document.createElement('tr');
-                newRow.innerHTML = `
-                    <td>${today}</td>
-                    <td>${vendorName}</td>
-                    <td>${productName}</td>
-                    <td><span class="status ${statusClass}">${transType}</span></td>
-                    <td>${fileHTML}</td>
-                `;
-                tableBody.prepend(newRow); // Adds it to the top of the list
-
-                // 4. PREPARE DATA FOR YOUR BACKEND DATABASE
-                // This FormData object is exactly what you will send to your server/database
-                const formData = new FormData(form);
-                formData.append('date_logged', today);
-
-                console.log("SUCCESS! Data ready to be sent to database:");
-                for (let [key, value] of formData.entries()) {
-                    console.log(`${key}:`, value);
-                }
-                alert("Form processed! Check your browser console to see the database payload.");
-
-                // 5. Reset the form for the next entry
-                form.reset();
+        // 1. Show user that a file was successfully selected
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                fileLabelText.textContent = `${this.files.length} file(s) selected: ${this.files[0].name}`;
+                fileLabelText.style.color = '#2ecc71'; // Turns green
+            } else {
                 fileLabelText.textContent = 'Click to Upload Invoice / Folder';
                 fileLabelText.style.color = '#ff7200';
-            });
+            }
         });
-    </script>
+
+        // 2. Handle form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Stops the page from refreshing
+
+            // Grab the typed values
+            const vendorName = document.getElementById('vendor_name').value.trim();
+            const productName = document.getElementById('product_name').value.trim();
+            const transType = document.getElementById('transaction_type').value;
+            const fileAttached = fileInput.files.length > 0;
+
+            // Format the Date
+            const today = new Date().toISOString().split('T')[0];
+
+            // Set up the CSS class for Inbound vs Outbound
+            const statusClass = transType === 'Inbound' ? 'inbound' : 'outbound';
+
+            // ==========================================
+            // NEW FIX: CREATE A VIEWABLE LINK FOR THE FILE
+            // ==========================================
+            let fileHTML = `<span class="no-file">No File</span>`;
+            
+            if (fileAttached) {
+                // Grab the actual file the user uploaded
+                const uploadedFile = fileInput.files[0];
+                
+                // Create a temporary URL in the browser memory to view the file
+                const fileURL = URL.createObjectURL(uploadedFile);
+                
+                // Make it an <a> tag that opens in a new tab (_blank)
+                fileHTML = `<a href="${fileURL}" target="_blank" class="view-file-btn">📁 View Invoice</a>`;
+            }
+
+            // 3. Add the new row to the table dynamically
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${today}</td>
+                <td>${vendorName}</td>
+                <td>${productName}</td>
+                <td><span class="status ${statusClass}">${transType}</span></td>
+                <td>${fileHTML}</td>
+            `;
+            tableBody.prepend(newRow); // Adds it to the top of the list
+
+            // 4. PREPARE DATA FOR YOUR BACKEND DATABASE
+            const formData = new FormData(form);
+            formData.append('date_logged', today);
+
+            console.log("SUCCESS! Data ready to be sent to database.");
+            
+            // 5. Reset the form for the next entry
+            form.reset();
+            fileLabelText.textContent = 'Click to Upload Invoice / Folder';
+            fileLabelText.style.color = '#ff7200';
+        });
+    });
+</script>
+
 </body>
 </html>
