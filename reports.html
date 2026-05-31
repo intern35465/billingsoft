@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse Reports</title>
+    <link rel="stylesheet" href="reports.css">
+</head>
+<body>
+
+    <div class="reports-container">
+        <h1>Warehouse <span>Reports</span></h1>
+
+        <div class="glass-panel">
+            <h2>Log Vendor Stock</h2>
+            
+            <form class="vendor-form">
+                <div class="input-group">
+                    <label>Vendor / Supplier Name</label>
+                    <input type="text" placeholder="e.g., Britannia Industries">
+                </div>
+
+                <div class="input-group">
+                    <label>Products Provided</label>
+                    <input type="text" placeholder="e.g., 50 Cartons of Biscuits">
+                </div>
+
+                <div class="input-group">
+                    <label>Transaction Type</label>
+                    <select>
+                        <option>Stock Inbound (Received)</option>
+                        <option>Stock Outbound (Given)</option>
+                    </select>
+                </div>
+
+                <div class="input-group file-upload-box">
+                    <label for="invoice-upload" class="file-label">
+                        <span class="folder-icon">📁</span>
+                        <span class="upload-text">Click to Upload Invoice / Folder</span>
+                    </label>
+                    <input type="file" id="invoice-upload" class="file-input" multiple>
+                </div>
+
+                <button type="button" class="submit-btn">Save Report to Database</button>
+            </form>
+        </div>
+
+        <div class="glass-panel">
+            <h2>Recent Reports & Uploads</h2>
+            
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Vendor Name</th>
+                            <th>Products</th>
+                            <th>Type</th>
+                            <th>Invoice/Files</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2026-05-31</td>
+                            <td>Britannia Industries</td>
+                            <td>50 Cartons of Biscuits</td>
+                            <td><span class="status inbound">Inbound</span></td>
+                            <td><a href="#" class="view-file-btn">📁 View Invoice</a></td>
+                        </tr>
+                        <tr>
+                            <td>2026-05-30</td>
+                            <td>Local Supplier A</td>
+                            <td>Packaging Materials</td>
+                            <td><span class="status inbound">Inbound</span></td>
+                            <td><a href="#" class="view-file-btn">📁 View Invoice</a></td>
+                        </tr>
+                        <tr>
+                            <td>2026-05-29</td>
+                            <td>City Distribution Center</td>
+                            <td>20 Boxes of Wonder Cake</td>
+                            <td><span class="status outbound">Outbound</span></td>
+                            <td><span class="no-file">No File</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer-container">
+        <a href="main.html" class="setup-return-btn">Return to Main Dashboard</a>
+    </div>
+
+</body>
+</html>
