@@ -1,0 +1,292 @@
+/* =========================================
+   BASE STYLING & BACKGROUND
+   ========================================= */
+body {
+    margin: 0;
+    padding: 40px 20px;
+    font-family: Arial, sans-serif;
+    background-image: url('https://res.cloudinary.com/ddff5thvj/image/upload/v1779987780/bbyh3a5rllxtnuhn3ljv.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    position: relative;
+    color: white;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: -1;
+}
+
+/* =========================================
+   MAIN CONTAINER & TYPOGRAPHY
+   ========================================= */
+.reports-container {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.reports-container h1 {
+    text-align: center;
+    font-size: 38px;
+    margin-top: 0;
+    margin-bottom: 40px;
+    color: white;
+}
+
+.reports-container h1 span {
+    color: #ff7200;
+    text-shadow: 0 0 15px rgba(255, 114, 0, 0.8);
+}
+
+/* =========================================
+   GLASS PANELS (Sub-sections)
+   ========================================= */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.glass-panel h2 {
+    color: #ff7200;
+    font-size: 22px;
+    margin-top: 0;
+    margin-bottom: 25px;
+    border-bottom: 1px solid rgba(255, 114, 0, 0.3);
+    padding-bottom: 10px;
+}
+
+/* =========================================
+   VENDOR FORM STYLING
+   ========================================= */
+.vendor-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    font-size: 13px;
+    color: #bbb;
+    margin-bottom: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.input-group input[type="text"],
+.input-group select {
+    background: #1a1a1a;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.3s;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    border-color: #ff7200;
+    box-shadow: 0 0 10px rgba(255, 114, 0, 0.4);
+}
+
+/* =========================================
+   FILE UPLOAD DROPZONE
+   ========================================= */
+.file-upload-box {
+    grid-column: span 2; /* Stretches across both columns */
+}
+
+.file-input {
+    display: none; /* Hides the default ugly file input */
+}
+
+.file-label {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px dashed rgba(255, 114, 0, 0.5);
+    border-radius: 10px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.file-label:hover {
+    background: rgba(255, 114, 0, 0.1);
+    border-color: #ff7200;
+}
+
+.folder-icon {
+    font-size: 35px;
+}
+
+.upload-text {
+    color: #ff7200;
+    font-weight: bold;
+}
+
+/* =========================================
+   SUBMIT BUTTON
+   ========================================= */
+.submit-btn {
+    grid-column: span 2;
+    background: #ff7200;
+    color: #fff;
+    border: none;
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(255, 114, 0, 0.6);
+}
+
+/* =========================================
+   REPORTS TABLE
+   ========================================= */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+th {
+    background: rgba(0, 0, 0, 0.5);
+    color: #ff7200;
+    padding: 16px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+td {
+    padding: 16px;
+    color: #ddd;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 14px;
+}
+
+tbody tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Status Badges */
+.status {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+.status.inbound {
+    background: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+}
+.status.outbound {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
+/* View File Button */
+.view-file-btn {
+    display: inline-block;
+    background: #1a1a1a;
+    color: #ff7200;
+    border: 1px solid rgba(255, 114, 0, 0.4);
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.view-file-btn:hover {
+    background: #ff7200;
+    color: white;
+    box-shadow: 0 0 10px rgba(255, 114, 0, 0.4);
+}
+
+.no-file {
+    color: #666;
+    font-style: italic;
+    font-size: 13px;
+}
+
+/* =========================================
+   FOOTER RETURN BUTTON
+   ========================================= */
+.footer-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    padding-bottom: 40px;
+}
+
+.setup-return-btn {
+    background: #1a1a1a;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 14px 45px;
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.4s;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+.setup-return-btn:hover {
+    background: #252525;
+    border-color: #ff7200;
+    transform: translateY(-3px);
+    box-shadow: 0 0 15px rgba(255, 114, 0, 0.5);
+}
+
+/* =========================================
+   RESPONSIVE DESIGN (Mobile)
+   ========================================= */
+@media (max-width: 768px) {
+    .vendor-form {
+        grid-template-columns: 1fr; /* Stacks inputs on small screens */
+    }
+    .file-upload-box, .submit-btn {
+        grid-column: span 1;
+    }
+    .glass-panel {
+        padding: 20px;
+    }
+}
