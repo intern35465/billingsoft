@@ -1,101 +1,209 @@
-body{
-    background:#3f3f3f;
-    color:white;
-    font-family:Arial,sans-serif;
+/* =========================================
+   BASE BODY & BACKGROUND 
+   ========================================= */
+body {
+    margin: 0;
+    padding: 40px 20px;
+    font-family: Arial, sans-serif;
+    background-image: url('https://res.cloudinary.com/ddff5thvj/image/upload/v1779987780/bbyh3a5rllxtnuhn3ljv.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    position: relative;
+    color: white;
 }
 
-.tracking-container{
-    background:rgba(0,0,0,0.35);
-    backdrop-filter:blur(10px);
-    border-radius:15px;
-    padding:30px;
-    color:white;
+/* DARK OVERLAY */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: -1;
 }
 
-h2,h3{
-    color:#ff7200;
+/* =========================================
+   MAIN INVOICE CONTAINER (Frosted Glass)
+   ========================================= */
+.invoice-container {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-h3{
-    border-left:4px solid #ff7200;
-    padding-left:10px;
+/* MAIN TITLE */
+.invoice-container h1 {
+    text-align: center;
+    font-size: 38px;
+    margin-top: 0;
+    margin-bottom: 40px;
+    color: white;
 }
 
-input[type="text"]{
-    background:#222;
-    color:white;
-    border:1px solid #555;
-    border-radius:8px;
+/* ORANGE GLOW FOR SPECIFIC TITLE WORDS */
+.invoice-container h1 span {
+    color: #ff7200;
+    text-shadow: 0 0 15px rgba(255, 114, 0, 0.8);
 }
 
-input[type="text"]:focus{
-    border-color:#ff7200;
+/* =========================================
+   TOP SEARCH / TRACKING INPUT SECTION
+   ========================================= */
+.search-section {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 40px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 12px;
+    flex-wrap: wrap; /* Allows stacking on mobile screens */
 }
 
-button,
-.action-btn{
-    background:#ff7200;
-    color:white;
-    border:none;
-    border-radius:8px;
+/* INPUT FIELD */
+.search-section input {
+    flex: 1;
+    min-width: 250px;
+    background: #1a1a1a;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    transition: 0.3s;
 }
 
-button:hover,
-.action-btn:hover{
-    background:#e56700;
+.search-section input:focus {
+    border-color: #ff7200;
+    box-shadow: 0 0 10px rgba(255, 114, 0, 0.4);
 }
 
-.main-table{
-    background:#111;
-    color:white;
-    border-radius:10px;
-    overflow:hidden;
+/* MAIN TRACK INVOICE BUTTON */
+.search-section button {
+    background: #ff7200;
+    color: #fff;
+    border: none;
+    padding: 15px 35px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    white-space: nowrap;
 }
 
-.main-table th{
-    background:#ff7200;
-    color:white;
+.search-section button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(255, 114, 0, 0.6);
 }
 
-.main-table td{
-    border-bottom:1px solid #333;
+/* =========================================
+   INVOICE TABLE STYLING
+   ========================================= */
+.invoice-table-wrapper {
+    overflow-x: auto; /* Adds a scrollbar on mobile instead of breaking layout */
+    border-radius: 10px;
 }
 
-.main-table tr:hover{
-    background:#1a1a1a;
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px; /* Forces table to stay readable on small screens */
 }
 
-.meta-grid{
-    background:#1b1b1b;
-    border-radius:10px;
+/* TABLE HEADERS */
+th {
+    background: rgba(0, 0, 0, 0.5);
+    color: #ff7200;
+    padding: 18px 20px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #ff7200;
 }
 
-.meta-item{
-    background:#111;
-    border-left:4px solid #ff7200;
-    padding:12px;
-    border-radius:8px;
+/* TABLE ROWS */
+td {
+    padding: 16px 20px;
+    color: #ddd;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 14px;
+    vertical-align: middle;
 }
 
-.class-label{
-    color:#aaa;
+/* HOVER EFFECT ON ROWS */
+tbody tr {
+    transition: background 0.2s;
 }
 
-.class-value{
-    color:white;
+tbody tr:hover {
+    background: rgba(255, 255, 255, 0.05);
 }
 
-.badge-paid{
-    background:#ff7200;
-    color:white;
+/* INVOICE NUMBER LINKS */
+td a {
+    color: #ff7200;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
 }
 
-.msg-success{
-    background:#1f3a1f;
-    color:#7cff7c;
+td a:hover {
+    text-shadow: 0 0 10px rgba(255, 114, 0, 0.6);
+    text-decoration: underline;
 }
 
-.msg-error{
-    background:#3d1a1a;
-    color:#ff8a8a;
+/* SMALL TRACK BUTTONS INSIDE THE TABLE */
+.track-action-btn {
+    background: #1a1a1a;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.track-action-btn:hover {
+    background: #252525;
+    border-color: #ff7200;
+    color: #ff7200;
+    box-shadow: 0 0 10px rgba(255, 114, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+/* =========================================
+   RESPONSIVE DESIGN FOR MOBILE
+   ========================================= */
+@media (max-width: 768px) {
+    .invoice-container {
+        padding: 20px;
+    }
+    
+    .invoice-container h1 {
+        font-size: 28px;
+    }
+    
+    .search-section {
+        flex-direction: column;
+    }
+    
+    .search-section button {
+        width: 100%;
+    }
 }
