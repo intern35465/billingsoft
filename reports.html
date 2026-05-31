@@ -4,32 +4,337 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Warehouse Reports</title>
-    <link rel="stylesheet" href="reports.css">
+    
+    <style>
+        /* =========================================
+           BASE STYLING & BACKGROUND
+           ========================================= */
+        body {
+            margin: 0;
+            padding: 40px 20px;
+            font-family: Arial, sans-serif;
+            background-image: url('https://res.cloudinary.com/ddff5thvj/image/upload/v1779987780/bbyh3a5rllxtnuhn3ljv.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            position: relative;
+            color: white;
+        }
+
+        /* Fixed Overlay: z-index ensures it stays BEHIND your inputs */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: -1; 
+        }
+
+        /* =========================================
+           MAIN CONTAINER & TYPOGRAPHY
+           ========================================= */
+        .reports-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10; /* Ensures the whole container is clickable */
+        }
+
+        .reports-container h1 {
+            text-align: center;
+            font-size: 38px;
+            margin-top: 0;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .reports-container h1 span {
+            color: #ff7200;
+            text-shadow: 0 0 15px rgba(255, 114, 0, 0.8);
+        }
+
+        /* =========================================
+           GLASS PANELS (Sub-sections)
+           ========================================= */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .glass-panel h2 {
+            color: #ff7200;
+            font-size: 22px;
+            margin-top: 0;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255, 114, 0, 0.3);
+            padding-bottom: 10px;
+        }
+
+        /* =========================================
+           VENDOR FORM STYLING
+           ========================================= */
+        .vendor-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-size: 13px;
+            color: #bbb;
+            margin-bottom: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Made inputs extremely clickable and interactive */
+        .input-group input[type="text"],
+        .input-group select {
+            background: #1a1a1a;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+            cursor: text;
+        }
+
+        .input-group select {
+            cursor: pointer;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: #ff7200;
+            box-shadow: 0 0 10px rgba(255, 114, 0, 0.4);
+        }
+
+        /* =========================================
+           FILE UPLOAD DROPZONE
+           ========================================= */
+        .file-upload-box {
+            grid-column: span 2; 
+        }
+
+        .file-input {
+            display: none; 
+        }
+
+        .file-label {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px dashed rgba(255, 114, 0, 0.5);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-label:hover {
+            background: rgba(255, 114, 0, 0.1);
+            border-color: #ff7200;
+        }
+
+        .folder-icon {
+            font-size: 35px;
+        }
+
+        .upload-text {
+            color: #ff7200;
+            font-weight: bold;
+        }
+
+        /* =========================================
+           SUBMIT BUTTON
+           ========================================= */
+        .submit-btn {
+            grid-column: span 2;
+            background: #ff7200;
+            color: #fff;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(255, 114, 0, 0.6);
+        }
+
+        /* =========================================
+           REPORTS TABLE
+           ========================================= */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th {
+            background: rgba(0, 0, 0, 0.5);
+            color: #ff7200;
+            padding: 16px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 16px;
+            color: #ddd;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Status Badges */
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.inbound {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+        .status.outbound {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        /* View File Button */
+        .view-file-btn {
+            display: inline-block;
+            background: #ff7200;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .view-file-btn:hover {
+            background: #e66600;
+            box-shadow: 0 0 10px rgba(255, 114, 0, 0.4);
+        }
+
+        .no-file {
+            color: #666;
+            font-style: italic;
+            font-size: 13px;
+        }
+
+        /* =========================================
+           FOOTER RETURN BUTTON
+           ========================================= */
+        .footer-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            padding-bottom: 40px;
+        }
+
+        .setup-return-btn {
+            background: #1a1a1a;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 14px 45px;
+            font-size: 15px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.4s;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+
+        .setup-return-btn:hover {
+            background: #252525;
+            border-color: #ff7200;
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px rgba(255, 114, 0, 0.5);
+        }
+
+        /* =========================================
+           RESPONSIVE DESIGN (Mobile)
+           ========================================= */
+        @media (max-width: 768px) {
+            .vendor-form {
+                grid-template-columns: 1fr; 
+            }
+            .file-upload-box, .submit-btn {
+                grid-column: span 1;
+            }
+            .glass-panel {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-    <div class="reports-container">
+    <main class="reports-container">
         <h1>Warehouse <span>Reports</span></h1>
 
+        <!-- SECTION 1: ADD VENDOR & UPLOAD INVOICE -->
         <div class="glass-panel">
             <h2>Log Vendor Stock</h2>
             
-            <form class="vendor-form">
+            <!-- Added a REAL form tag with ID for Javascript targeting -->
+            <form id="db-form" class="vendor-form">
                 <div class="input-group">
-                    <label>Vendor / Supplier Name</label>
-                    <input type="text" placeholder="e.g., Britannia Industries">
+                    <label for="vendor_name">Vendor / Supplier Name</label>
+                    <input type="text" id="vendor_name" name="vendor_name" placeholder="e.g., Britannia Industries" required>
                 </div>
 
                 <div class="input-group">
-                    <label>Products Provided</label>
-                    <input type="text" placeholder="e.g., 50 Cartons of Biscuits">
+                    <label for="product_name">Products Provided</label>
+                    <input type="text" id="product_name" name="product_name" placeholder="e.g., 50 Cartons of Biscuits" required>
                 </div>
 
                 <div class="input-group">
-                    <label>Transaction Type</label>
-                    <select>
-                        <option>Stock Inbound (Received)</option>
-                        <option>Stock Outbound (Given)</option>
+                    <label for="transaction_type">Transaction Type</label>
+                    <select id="transaction_type" name="transaction_type">
+                        <option value="Inbound">Stock Inbound (Received)</option>
+                        <option value="Outbound">Stock Outbound (Given)</option>
                     </select>
                 </div>
 
@@ -38,13 +343,14 @@
                         <span class="folder-icon">📁</span>
                         <span class="upload-text">Click to Upload Invoice / Folder</span>
                     </label>
-                    <input type="file" id="invoice-upload" class="file-input" multiple>
+                    <input type="file" id="invoice-upload" name="invoice_file" class="file-input" multiple>
                 </div>
 
-                <button type="button" class="submit-btn">Save Report to Database</button>
+                <button type="submit" class="submit-btn">Save Report to Database</button>
             </form>
         </div>
 
+        <!-- SECTION 2: REPORTS & UPLOADS DASHBOARD -->
         <div class="glass-panel">
             <h2>Recent Reports & Uploads</h2>
             
@@ -59,152 +365,95 @@
                             <th>Invoice/Files</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="report-table-body">
+                        <!-- Default dummy data. Real data will append here -->
                         <tr>
                             <td>2026-05-31</td>
                             <td>Britannia Industries</td>
                             <td>50 Cartons of Biscuits</td>
                             <td><span class="status inbound">Inbound</span></td>
-                            <td><a href="#" class="view-file-btn">📁 View Invoice</a></td>
-                        </tr>
-                        <tr>
-                            <td>2026-05-30</td>
-                            <td>Local Supplier A</td>
-                            <td>Packaging Materials</td>
-                            <td><span class="status inbound">Inbound</span></td>
-                            <td><a href="#" class="view-file-btn">📁 View Invoice</a></td>
-                        </tr>
-                        <tr>
-                            <td>2026-05-29</td>
-                            <td>City Distribution Center</td>
-                            <td>20 Boxes of Wonder Cake</td>
-                            <td><span class="status outbound">Outbound</span></td>
-                            <td><span class="no-file">No File</span></td>
+                            <td><button class="view-file-btn">📁 View Invoice</button></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
+    </main>
 
-    </div>
-
+    <!-- RETURN BUTTON -->
     <div class="footer-container">
         <a href="main.html" class="setup-return-btn">Return to Main Dashboard</a>
     </div>
-// Wait for the DOM to fully load
-document.addEventListener('DOMContentLoaded', () => {
-    
-    const submitBtn = document.querySelector('.submit-btn');
-    const tableBody = document.querySelector('tbody');
-    const fileInput = document.getElementById('invoice-upload');
-    const fileLabelText = document.querySelector('.upload-text');
 
-    // 1. UPDATE UI WHEN A FILE IS SELECTED
-    fileInput.addEventListener('change', function() {
-        if (this.files && this.files.length > 0) {
-            // Show the name of the first file uploaded
-            fileLabelText.textContent = `${this.files.length} file(s) selected: ${this.files[0].name}`;
-            fileLabelText.style.color = '#2ecc71'; // Turn green to confirm
-        } else {
-            fileLabelText.textContent = 'Click to Upload Invoice / Folder';
-            fileLabelText.style.color = '#ff7200';
-        }
-    });
-
-    // 2. HANDLE FORM SUBMISSION & DATA CAPTURE
-    submitBtn.addEventListener('click', async (e) => {
-        e.preventDefault(); // Prevent page reload
-
-        // Capture all input elements
-        const vendorNameInput = document.querySelector('input[placeholder="e.g., Britannia Industries"]');
-        const productsInput = document.querySelector('input[placeholder="e.g., 50 Cartons of Biscuits"]');
-        const transactionTypeInput = document.querySelector('select');
-        
-        // Extract values
-        const vendorName = vendorNameInput.value.trim();
-        const products = productsInput.value.trim();
-        const transactionType = transactionTypeInput.value;
-        const files = fileInput.files;
-
-        // Form Validation (Don't let them submit empty data)
-        if (!vendorName || !products) {
-            alert('Please fill in both the Vendor Name and Products Provided.');
-            return;
-        }
-
-        // Generate Current Date for the report
-        const today = new Date().toISOString().split('T')[0];
-
-        // Determine Status Class based on selection
-        const isInbound = transactionType.includes('Inbound');
-        const statusClass = isInbound ? 'inbound' : 'outbound';
-        const statusText = isInbound ? 'Inbound' : 'Outbound';
-
-        // File handling logic (Checks if a file was actually uploaded)
-        let fileHTML = '<span class="no-file">No File</span>';
-        if (files.length > 0) {
-            // In a real app, the href would be the URL returned from your server after uploading
-            fileHTML = `<a href="#" class="view-file-btn">📁 View Invoice</a>`;
-        }
-
-        // 3. DYNAMICALLY INJECT NEW DATA INTO THE TABLE
-        const newRow = document.createElement('tr');
-        newRow.innerHTML = `
-            <td>${today}</td>
-            <td>${vendorName}</td>
-            <td>${products}</td>
-            <td><span class="status ${statusClass}">${statusText}</span></td>
-            <td>${fileHTML}</td>
-        `;
-        
-        // Add the new row to the top of the table
-        tableBody.prepend(newRow);
-
-        // 4. SEND DATA TO YOUR BACKEND (The "Real Software" part)
-        // We use FormData because we are transmitting text AND physical files
-        const formData = new FormData();
-        formData.append('vendorName', vendorName);
-        formData.append('products', products);
-        formData.append('transactionType', statusText);
-        formData.append('date', today);
-        
-        if (files.length > 0) {
-            formData.append('invoiceFile', files[0]); // Attach the actual file
-        }
-
-        try {
-            /* 
-               ===========================================================
-               BACKEND CONNECTION: 
-               Replace '/api/save-report' with your actual server endpoint
-               ===========================================================
-            */
-            // const response = await fetch('/api/save-report', {
-            //     method: 'POST',
-            //     body: formData 
-            // });
+    <!-- JAVASCRIPT: Makes the form work and prepares data for the Database -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
             
-            // if (response.ok) {
-            //     console.log('Successfully saved to database!');
-            // } else {
-            //     console.error('Failed to save to database.');
-            // }
+            const form = document.getElementById('db-form');
+            const fileInput = document.getElementById('invoice-upload');
+            const fileLabelText = document.querySelector('.upload-text');
+            const tableBody = document.getElementById('report-table-body');
 
-            console.log("Form Data prepared for backend:", Object.fromEntries(formData));
-            
-        } catch (error) {
-            console.error("Network error:", error);
-        }
+            // 1. Show user that a file was successfully selected
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files.length > 0) {
+                    fileLabelText.textContent = `${this.files.length} file(s) selected: ${this.files[0].name}`;
+                    fileLabelText.style.color = '#2ecc71'; // Turns green
+                } else {
+                    fileLabelText.textContent = 'Click to Upload Invoice / Folder';
+                    fileLabelText.style.color = '#ff7200';
+                }
+            });
 
-        // 5. RESET FORM AFTER SUCCESSFUL SUBMISSION
-        vendorNameInput.value = '';
-        productsInput.value = '';
-        transactionTypeInput.selectedIndex = 0;
-        fileInput.value = ''; // Clear file input
-        fileLabelText.textContent = 'Click to Upload Invoice / Folder';
-        fileLabelText.style.color = '#ff7200';
-    });
-});
+            // 2. Handle form submission (The "Real Software" part)
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // Stops the page from refreshing
 
+                // Grab the typed values
+                const vendorName = document.getElementById('vendor_name').value.trim();
+                const productName = document.getElementById('product_name').value.trim();
+                const transType = document.getElementById('transaction_type').value;
+                const fileAttached = fileInput.files.length > 0;
+
+                // Format the Date
+                const today = new Date().toISOString().split('T')[0];
+
+                // Set up the CSS class for Inbound vs Outbound
+                const statusClass = transType === 'Inbound' ? 'inbound' : 'outbound';
+
+                // Setup File Button HTML
+                const fileHTML = fileAttached 
+                    ? `<button class="view-file-btn">📁 View Invoice</button>` 
+                    : `<span class="no-file">No File</span>`;
+
+                // 3. Add the new row to the table dynamically
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td>${today}</td>
+                    <td>${vendorName}</td>
+                    <td>${productName}</td>
+                    <td><span class="status ${statusClass}">${transType}</span></td>
+                    <td>${fileHTML}</td>
+                `;
+                tableBody.prepend(newRow); // Adds it to the top of the list
+
+                // 4. PREPARE DATA FOR YOUR BACKEND DATABASE
+                // This FormData object is exactly what you will send to your server/database
+                const formData = new FormData(form);
+                formData.append('date_logged', today);
+
+                console.log("SUCCESS! Data ready to be sent to database:");
+                for (let [key, value] of formData.entries()) {
+                    console.log(`${key}:`, value);
+                }
+                alert("Form processed! Check your browser console to see the database payload.");
+
+                // 5. Reset the form for the next entry
+                form.reset();
+                fileLabelText.textContent = 'Click to Upload Invoice / Folder';
+                fileLabelText.style.color = '#ff7200';
+            });
+        });
+    </script>
 </body>
 </html>
