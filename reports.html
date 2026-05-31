@@ -387,79 +387,94 @@
 
     <!-- JAVASCRIPT: Makes the form work and prepares data for the Database --><script>
     document.addEventListener('DOMContentLoaded', () => {
-        
         const form = document.getElementById('db-form');
         const fileInput = document.getElementById('invoice-upload');
         const fileLabelText = document.querySelector('.upload-text');
         const tableBody = document.getElementById('report-table-body');
 
-        // 1. Show user that a file was successfully selected
+        // Load existing reports from LocalStorage so the table doesn't clear on refresh
+        let savedReports = JSON.parse(localStorage.getItem('warehouseReports')) || [];
+
+        // Function to render the table
+        function renderTable() {
+            tableBody.innerHTML = '';
+            savedReports.forEach(report => {
+                const fileHTML = report.fileData 
+                    ? `<a href="${report.fileData}" target="_blank" class="view-file-btn" download="${report.fileName}">📁 View Invoice</a>` 
+                    : `<span class="no-file">No File</span>`;
+                
+                const statusClass = report.transType === 'Inbound' ? 'inbound' : 'outbound';
+
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td style="color: #ff7200; font-weight: bold;">${report.id}</td>
+                    <td>${report.date}</td>
+                    <td>${report.vendor}</td>
+                    <td>${report.product}</td>
+                    <td><span class="status ${statusClass}">${report.transType}</span></td>
+                    <td>${fileHTML}</td>
+                `;
+                tableBody.prepend(newRow);
+            });
+        }
+        renderTable(); // Run on load
+
+        // File selection UI update
         fileInput.addEventListener('change', function() {
             if (this.files && this.files.length > 0) {
                 fileLabelText.textContent = `${this.files.length} file(s) selected: ${this.files[0].name}`;
-                fileLabelText.style.color = '#2ecc71'; // Turns green
+                fileLabelText.style.color = '#2ecc71'; 
             } else {
                 fileLabelText.textContent = 'Click to Upload Invoice / Folder';
                 fileLabelText.style.color = '#ff7200';
             }
         });
 
-        // 2. Handle form submission
+        // Handle form submission
         form.addEventListener('submit', function(e) {
-            e.preventDefault(); // Stops the page from refreshing
+            e.preventDefault(); 
 
-            // Grab the typed values
+            // Auto-Generate a unique ID (e.g., REP-849201)
+            const reportID = 'REP-' + Math.floor(100000 + Math.random() * 900000);
+
             const vendorName = document.getElementById('vendor_name').value.trim();
             const productName = document.getElementById('product_name').value.trim();
             const transType = document.getElementById('transaction_type').value;
-            const fileAttached = fileInput.files.length > 0;
-
-            // Format the Date
             const today = new Date().toISOString().split('T')[0];
 
-            // Set up the CSS class for Inbound vs Outbound
-            const statusClass = transType === 'Inbound' ? 'inbound' : 'outbound';
-
-            // ==========================================
-            // NEW FIX: CREATE A VIEWABLE LINK FOR THE FILE
-            // ==========================================
-            let fileHTML = `<span class="no-file">No File</span>`;
-            
-            if (fileAttached) {
-                // Grab the actual file the user uploaded
-                const uploadedFile = fileInput.files[0];
+            // If a file is attached, convert it to Base64 so it can be saved in LocalStorage
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
                 
-                // Create a temporary URL in the browser memory to view the file
-                const fileURL = URL.createObjectURL(uploadedFile);
-                
-                // Make it an <a> tag that opens in a new tab (_blank)
-                fileHTML = `<a href="${fileURL}" target="_blank" class="view-file-btn">📁 View Invoice</a>`;
+                reader.onload = function(event) {
+                    const base64FileData = event.target.result;
+                    saveAndRender(reportID, today, vendorName, productName, transType, base64FileData, file.name);
+                };
+                reader.readAsDataURL(file); // Converts file to saveable text string
+            } else {
+                saveAndRender(reportID, today, vendorName, productName, transType, null, null);
             }
+        });
 
-            // 3. Add the new row to the table dynamically
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
-                <td>${today}</td>
-                <td>${vendorName}</td>
-                <td>${productName}</td>
-                <td><span class="status ${statusClass}">${transType}</span></td>
-                <td>${fileHTML}</td>
-            `;
-            tableBody.prepend(newRow); // Adds it to the top of the list
-
-            // 4. PREPARE DATA FOR YOUR BACKEND DATABASE
-            const formData = new FormData(form);
-            formData.append('date_logged', today);
-
-            console.log("SUCCESS! Data ready to be sent to database.");
+        function saveAndRender(id, date, vendor, product, transType, fileData, fileName) {
+            const newReport = { id, date, vendor, product, transType, fileData, fileName };
             
-            // 5. Reset the form for the next entry
+            // Add to our array and save to browser memory
+            savedReports.push(newReport);
+            localStorage.setItem('warehouseReports', JSON.stringify(savedReports));
+
+            renderTable(); // Update the visual table
+            
             form.reset();
             fileLabelText.textContent = 'Click to Upload Invoice / Folder';
             fileLabelText.style.color = '#ff7200';
-        });
+            
+            alert(`Report saved with ID: ${id}`);
+        }
     });
 </script>
+
 
 </body>
 </html>
